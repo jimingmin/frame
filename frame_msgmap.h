@@ -10,41 +10,15 @@
 
 #include "../common/common_object.h"
 #include "../common/common_typedef.h"
+#include "../common/common_singleton.h"
+#include "frame_msgentry.h"
+#include "frame_msghandle.h"
 #include "frame_namespace.h"
 
 #include <map>
 using namespace std;
 
 FRAME_NAMESPACE_BEGIN
-
-class IMsg : public CObject
-{
-public:
-	virtual ~IMsg(){};
-
-	virtual int32_t Encode(const uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
-
-	virtual int32_t Decode(uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
-};
-
-typedef IMsg	IMsgHead;
-typedef IMsg	IMsgBody;
-
-typedef int32_t (CObject::*MsgHandleProc)(CObject *, IMsgHead *, IMsgBody *);
-
-class MsgEntry
-{
-public:
-	MsgEntry(CObject *pObj, IMsgBody *pMsgBody, MsgHandleProc Proc)
-	{
-		m_pObject = pObj;
-		m_pMsgBody = pMsgBody;
-		m_pMsgHandleProc = Proc;
-	}
-	CObject			*m_pObject;
-	IMsgBody		*m_pMsgBody;
-	MsgHandleProc	m_pMsgHandleProc;
-};
 
 class CMsgMapDecl
 {
@@ -66,9 +40,15 @@ public:
 		return 0;
 	}
 
-	void RegistMsgEntry(uint32_t nMsgID, CObject *pObj, IMsgBody *pMsgBody, MsgHandleProc Proc)
+	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, IMsgBody *pMsgBody, CObject *pObj, i32_pco_pmh_pmb Proc)
 	{
-		MsgEntry *pMsgEntry = new MsgEntry(pObj, pMsgBody, Proc);
+		MsgEntry *pMsgEntry = new MsgEntry(pObj, pMsgHead, pMsgBody, Proc);
+		m_stMsgMap[nMsgID] = pMsgEntry;
+	}
+
+	void RegistMsgEntry(uint32_t nMsgID, CObject *pObj, i32_pco_pu8_i32 Proc)
+	{
+		MsgEntry *pMsgEntry = new MsgEntry(pObj, Proc);
 		m_stMsgMap[nMsgID] = pMsgEntry;
 	}
 
@@ -96,8 +76,11 @@ public:	\
 	void DeclMsgMap()	\
 	{
 
-#define ON_MSGEVENT(id, obj, msg, msgproc)	\
-		g_MsgMapDecl.RegistMsgEntry(id, obj, msg, msgproc);
+#define ON_MSGEVENT(id, msghead, msgbody, obj, msgproc)	\
+		g_MsgMapDecl.RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb>(&msgproc));
+
+#define ON_STREAMEVENT(id, obj, msgproc)	\
+		g_MsgMapDecl.RegistMsgEntry(id, new obj(), static_cast<i32_pco_pu8_i32>(&msgproc));
 
 #define MSGMAP_END(entity)	\
 	}	\

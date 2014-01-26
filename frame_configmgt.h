@@ -46,12 +46,27 @@ public:
 
 	void RegistConfig(const char *szConfigName, IConfig *pConfig);
 
+	IConfig *GetConfig(const char *szConfigName);
+
 protected:
 	int32_t			m_nConfigCount;
 	ConfigInfo		m_arrConfigInfo[enmMaxConfigInfoSize];
 };
 
 #define g_FrameConfigMgt		CSingleton<CFrameConfigMgt>::GetInstance()
+
+class regist
+{
+public:
+	regist(const char *szConfigName, IConfig *pConfig)
+	{
+		g_FrameConfigMgt.RegistConfig(szConfigName, pConfig);
+	}
+};
+
+#define REGIST_CONFIG(config_name, config_class)	\
+	static regist reg_##config_class(config_name, new config_class(config_name))
+
 
 FRAME_NAMESPACE_END
 

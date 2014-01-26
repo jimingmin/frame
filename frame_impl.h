@@ -8,6 +8,7 @@
 #ifndef FRAME_IMPL_H_
 #define FRAME_IMPL_H_
 
+#include <stdint.h>
 #include "frame_namespace.h"
 
 FRAME_NAMESPACE_BEGIN
