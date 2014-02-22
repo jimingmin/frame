@@ -52,6 +52,12 @@ public:
 		m_stMsgMap[nMsgID] = pMsgEntry;
 	}
 
+	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, IMsgBody *pMsgBody, CObject *pObj, i32_pco_pmh_pmb_pu8_i32 Proc)
+	{
+		MsgEntry *pMsgEntry = new MsgEntry(pObj, pMsgHead, pMsgBody, Proc);
+		m_stMsgMap[nMsgID] = pMsgEntry;
+	}
+
 	void Clear()
 	{
 		m_stMsgMap.clear();
@@ -76,8 +82,11 @@ public:	\
 	void DeclMsgMap()	\
 	{
 
-#define ON_MSGEVENT(id, msghead, msgbody, obj, msgproc)	\
+#define ON_PROC_PMH_PMB(id, msghead, msgbody, obj, msgproc)	\
 		g_MsgMapDecl.RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb>(&msgproc));
+
+#define ON_PROC_PMH_PMB_PU8_I32(id, msghead, msgbody, obj, msgproc)	\
+		g_MsgMapDecl.RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb_pu8_i32>(&msgproc));
 
 #define ON_STREAMEVENT(id, obj, msgproc)	\
 		g_MsgMapDecl.RegistMsgEntry(id, new obj(), static_cast<i32_pco_pu8_i32>(&msgproc));

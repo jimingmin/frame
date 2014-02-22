@@ -41,8 +41,15 @@ int32_t FrameMsgCallBack(int32_t nMsgID, ...)
 		IMsgBody *pMsgBody = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb.m_pMsgBody;
 
 		uint32_t nOffset = 0;
-		pMsgHead->Decode(pBuf, nBufSize, nOffset);
-		pMsgBody->Decode(pBuf, nBufSize, nOffset);
+		if(pMsgHead->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		if(pMsgBody->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
 
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pMsgBody);
 	}
@@ -59,7 +66,31 @@ int32_t FrameMsgCallBack(int32_t nMsgID, ...)
 		nRet = (pInstance->*Proc)(pObj, pBuf, nBufSize);
 	}
 	break;
+	case enmProcCodeFlag_i32_pco_pmh_pmb_pu8_i32:
+	{
+		CObject *pObj = va_arg(ap, CObject *);
+		uint8_t *pBuf = va_arg(ap, uint8_t *);
+		int32_t nBufSize = va_arg(ap, int32_t);
 
+		i32_pco_pmh_pmb_pu8_i32 Proc = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgHandleProc;
+		CObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pObject;
+		IMsgHead *pMsgHead = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgHead;
+		IMsgBody *pMsgBody = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgBody;
+
+		uint32_t nOffset = 0;
+		if(pMsgHead->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		if(pMsgBody->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		nRet = (pInstance->*Proc)(pObj, pMsgHead, pMsgBody, pBuf, nBufSize);
+	}
+	break;
 	default:
 		nRet = 1;
 	break;
