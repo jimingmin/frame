@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_configmgt.h
  *
  *  Created on: 2014年1月22日
@@ -54,19 +54,6 @@ protected:
 };
 
 #define g_FrameConfigMgt		CSingleton<CFrameConfigMgt>::GetInstance()
-
-class regist
-{
-public:
-	regist(const char *szConfigName, IConfig *pConfig)
-	{
-		g_FrameConfigMgt.RegistConfig(szConfigName, pConfig);
-	}
-};
-
-#define REGIST_CONFIG(config_name, config_class)	\
-	static regist reg_##config_class(config_name, new config_class(config_name))
-
 
 FRAME_NAMESPACE_END
 

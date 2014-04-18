@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_impl.h
  *
  *  Created on: 2014年1月22日
@@ -8,12 +8,13 @@
 #ifndef FRAME_IMPL_H_
 #define FRAME_IMPL_H_
 
-#include <stdint.h>
+#include "../common/common_typedef.h"
+#include "../common/common_export.h"
 #include "frame_namespace.h"
 
 FRAME_NAMESPACE_BEGIN
 
-class IConfig
+class EXPORT IConfig
 {
 public:
 	IConfig(){};

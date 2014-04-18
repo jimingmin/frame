@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_timermgt.cpp
  *
  *  Created on: 2014年1月22日

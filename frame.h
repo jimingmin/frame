@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame.h
  *
  *  Created on: 2014年1月22日
@@ -8,9 +8,14 @@
 #ifndef FRAME_H_
 #define FRAME_H_
 
+#include "../common/common_singleton.h"
 #include "../common/common_typedef.h"
+#include "../common/common_export.h"
 #include "frame_impl.h"
 #include "frame_namespace.h"
+#include "frame_timermgt.h"
+#include "frame_msghandle.h"
+#include "frame_msgmap.h"
 
 #include <list>
 using namespace std;
@@ -20,20 +25,69 @@ FRAME_NAMESPACE_BEGIN
 class CFrame
 {
 public:
-	CFrame();
-	virtual ~CFrame();
+	EXPORT CFrame();
+	EXPORT virtual ~CFrame();
 
-	int32_t Init();
+	EXPORT int32_t Init();
 
-	int32_t Uninit();
+	EXPORT int32_t Uninit();
 
-	int32_t Run();
+	EXPORT int32_t Run();
 
-	void AddRunner(IRunnable *pRunner);
+	EXPORT void AddRunner(IRunnable *pRunner);
+
+	EXPORT int32_t CreateTimer(TimerProc Proc, CObject *pTimer, CObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
+
+	EXPORT int32_t RemoveTimer(TimerIndex timerIndex);
+
+	EXPORT void RegistConfig(const char *szConfigName, IConfig *pConfig);
+
+	EXPORT IConfig *GetConfig(const char *szConfigName);
+
+	EXPORT static int32_t FrameCallBack(int32_t nMsgID, ...);
 
 protected:
 	list<IRunnable *>		m_stRunnerList;
 };
+
+#define g_Frame		CSingleton<CFrame>::GetInstance()
+
+class EXPORT regist
+{
+public:
+	regist(const char *szConfigName, IConfig *pConfig);
+};
+
+#define REGIST_CONFIG(config_name, config_class)	\
+	static regist reg_##config_class(config_name, new config_class(config_name))
+
+#define MSGMAP_BEGIN(entity)	\
+class CMsgMapDecl_##entity	\
+{	\
+public:	\
+	CMsgMapDecl_##entity()	\
+{	\
+	DeclMsgMap();	\
+}	\
+	~CMsgMapDecl_##entity()	\
+{	\
+}	\
+	void DeclMsgMap()	\
+{
+
+#define ON_PROC_PMH_PMB(id, msghead, msgbody, obj, msgproc)	\
+	g_MsgMapDecl.RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb>(&msgproc));
+
+#define ON_PROC_PMH_PMB_PU8_I32(id, msghead, msgbody, obj, msgproc)	\
+	g_MsgMapDecl.RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb_pu8_i32>(&msgproc));
+
+#define ON_STREAMEVENT(id, obj, msgproc)	\
+	g_MsgMapDecl.RegistMsgEntry(id, new obj(), static_cast<i32_pco_pu8_i32>(&msgproc));
+
+#define MSGMAP_END(entity)	\
+}	\
+};	\
+	static CMsgMapDecl_##entity l_##entity;
 
 FRAME_NAMESPACE_END
 

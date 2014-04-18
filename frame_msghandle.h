@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_msghandle.h
  *
  *  Created on: 2014年1月23日
@@ -29,7 +29,7 @@ enum ProcCodeFlag
 };
 
 
-int32_t FrameMsgCallBack(int32_t nMsgID, ...);
+int32_t FrameMsgCallBack(int32_t nMsgID, va_list ap);
 
 
 FRAME_NAMESPACE_END

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_msgentry.h
  *
  *  Created on: 2014年1月23日

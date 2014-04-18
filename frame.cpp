@@ -1,13 +1,15 @@
-/*
+﻿/*
  * frame.cpp
  *
  *  Created on: 2014年1月22日
  *      Author: jimm
  */
 
-#include "frame_timermgt.h"
-#include "frame_configmgt.h"
 #include "frame.h"
+#include "frame_configmgt.h"
+
+#include <stdarg.h>
+#include <stddef.h>
 
 FRAME_NAMESPACE_BEGIN
 
@@ -66,6 +68,40 @@ int32_t CFrame::Run()
 	}
 
 	return 0;
+}
+
+int32_t CFrame::CreateTimer(TimerProc Proc, CObject *pTimer, CObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex)
+{
+	return g_FrameTimerMgt.CreateTimer(Proc, pTimer, pTimerData, nCycleTime, bLoop, timerIndex);
+}
+
+int32_t CFrame::RemoveTimer(TimerIndex timerIndex)
+{
+	return g_FrameTimerMgt.RemoveTimer(timerIndex);
+}
+
+void CFrame::RegistConfig(const char *szConfigName, IConfig *pConfig)
+{
+	return g_FrameConfigMgt.RegistConfig(szConfigName, pConfig);
+}
+
+IConfig *CFrame::GetConfig(const char *szConfigName)
+{
+	return g_FrameConfigMgt.GetConfig(szConfigName);
+}
+
+int32_t CFrame::FrameCallBack(int32_t nMsgID, ...)
+{
+	va_list ap;
+	va_start(ap, nMsgID);
+	int32_t nRet = FrameMsgCallBack(nMsgID, ap);
+	va_end(ap);
+	return nRet;
+}
+
+regist::regist(const char *szConfigName, IConfig *pConfig)
+{
+	g_FrameConfigMgt.RegistConfig(szConfigName, pConfig);
 }
 
 FRAME_NAMESPACE_END

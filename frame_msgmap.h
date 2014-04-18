@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_msgmap.h
  *
  *  Created on: 2014年1月22日
@@ -68,33 +68,7 @@ protected:
 
 #define g_MsgMapDecl				CSingleton<CMsgMapDecl>::GetInstance()
 
-#define MSGMAP_BEGIN(entity)	\
-class CMsgMapDecl_##entity	\
-{	\
-public:	\
-	CMsgMapDecl_##entity()	\
-	{	\
-		DeclMsgMap();	\
-	}	\
-	~CMsgMapDecl_##entity()	\
-	{	\
-	}	\
-	void DeclMsgMap()	\
-	{
 
-#define ON_PROC_PMH_PMB(id, msghead, msgbody, obj, msgproc)	\
-		g_MsgMapDecl.RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb>(&msgproc));
-
-#define ON_PROC_PMH_PMB_PU8_I32(id, msghead, msgbody, obj, msgproc)	\
-		g_MsgMapDecl.RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb_pu8_i32>(&msgproc));
-
-#define ON_STREAMEVENT(id, obj, msgproc)	\
-		g_MsgMapDecl.RegistMsgEntry(id, new obj(), static_cast<i32_pco_pu8_i32>(&msgproc));
-
-#define MSGMAP_END(entity)	\
-	}	\
-};	\
-static CMsgMapDecl_##entity l_##entity;
 
 FRAME_NAMESPACE_END
 

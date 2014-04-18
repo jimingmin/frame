@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_msghandle.cpp
  *
  *  Created on: 2014年1月23日
@@ -12,7 +12,7 @@
 
 FRAME_NAMESPACE_BEGIN
 
-int32_t FrameMsgCallBack(int32_t nMsgID, ...)
+int32_t FrameMsgCallBack(int32_t nMsgID, va_list ap)
 {
 	MsgEntry *pEntry = g_MsgMapDecl.GetMsgEntry(nMsgID);
 	if(pEntry == NULL)
@@ -24,8 +24,8 @@ int32_t FrameMsgCallBack(int32_t nMsgID, ...)
 
 	ProcCodeFlag flag = pEntry->m_nProcCodeFlag;
 
-	va_list ap;
-	va_start(ap, nMsgID);
+//	va_list ap;
+//	va_start(ap, nMsgID);
 
 	switch(flag)
 	{
@@ -96,7 +96,7 @@ int32_t FrameMsgCallBack(int32_t nMsgID, ...)
 	break;
 	}
 
-	va_end(ap);
+//	va_end(ap);
 
 	return nRet;
 }

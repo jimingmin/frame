@@ -1,4 +1,4 @@
-/*
+﻿/*
  * frame_timer.h
  *
  *  Created on: 2014年1月22日
@@ -12,6 +12,7 @@
 #include "../common/common_errordef.h"
 #include "../common/common_object.h"
 #include "../common/common_complextype.h"
+#include "../common/common_export.h"
 
 #include "frame_namespace.h"
 
@@ -27,7 +28,7 @@ typedef TimerIndex				TimerID;
 //定时器回调例程
 typedef int32_t (CObject::*TimerProc)(CTimer *pTimer);
 
-class Timer
+class EXPORT Timer
 {
 public:
 	Timer()
@@ -59,7 +60,7 @@ public:
 	uint32_t                attachedDataB;
 };
 
-class CTimer : public CObject
+class EXPORT CTimer : public CObject
 {
 public:
 	CTimer()
