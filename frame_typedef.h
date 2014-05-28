@@ -23,9 +23,12 @@ class IMsg : public CObject
 public:
 	virtual ~IMsg(){};
 
-	virtual int32_t Encode(Value &value, Document::AllocatorType& allocator) = 0;
+	//virtual int32_t Encode(Value &value, Document::AllocatorType& allocator) = 0;
+	virtual int32_t Encode(uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
 
-	virtual int32_t Decode(uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
+	virtual int32_t Decode(const uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
+
+	virtual void Dump(char* buf, const uint32_t size, uint32_t& offset) = 0;
 };
 
 typedef IMsg	IMsgHead;

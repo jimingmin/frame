@@ -53,8 +53,6 @@ protected:
 	ConfigInfo		m_arrConfigInfo[enmMaxConfigInfoSize];
 };
 
-#define g_FrameConfigMgt		CSingleton<CFrameConfigMgt>::GetInstance()
-
 FRAME_NAMESPACE_END
 
 #endif /* FRAME_CONFIGMGT_H_ */

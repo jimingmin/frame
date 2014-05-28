@@ -10,7 +10,6 @@
 
 #include "../common/common_object.h"
 #include "../common/common_typedef.h"
-#include "../common/common_singleton.h"
 #include "frame_msgentry.h"
 #include "frame_msghandle.h"
 #include "frame_namespace.h"
@@ -58,6 +57,12 @@ public:
 		m_stMsgMap[nMsgID] = pMsgEntry;
 	}
 
+	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, CObject *pObj, i32_pco_pmh_pu8_i32 Proc)
+	{
+		MsgEntry *pMsgEntry = new MsgEntry(pObj, pMsgHead, Proc);
+		m_stMsgMap[nMsgID] = pMsgEntry;
+	}
+
 	void Clear()
 	{
 		m_stMsgMap.clear();
@@ -65,10 +70,6 @@ public:
 protected:
 	map<uint32_t, MsgEntry *>		m_stMsgMap;
 };
-
-#define g_MsgMapDecl				CSingleton<CMsgMapDecl>::GetInstance()
-
-
 
 FRAME_NAMESPACE_END
 

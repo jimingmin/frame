@@ -7,14 +7,15 @@
 
 #include "frame_msgmap.h"
 #include "frame_msghandle.h"
+#include "frame_msgmap.h"
 
 #include <stddef.h>
 
 FRAME_NAMESPACE_BEGIN
 
-int32_t FrameMsgCallBack(int32_t nMsgID, va_list ap)
+int32_t FrameMsgCallBack(CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap)
 {
-	MsgEntry *pEntry = g_MsgMapDecl.GetMsgEntry(nMsgID);
+	MsgEntry *pEntry = stMsgMap.GetMsgEntry(nMsgID);
 	if(pEntry == NULL)
 	{
 		return -1;
@@ -89,6 +90,25 @@ int32_t FrameMsgCallBack(int32_t nMsgID, va_list ap)
 		}
 
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pMsgBody, pBuf, nBufSize);
+	}
+	break;
+	case enmProcCodeFlag_i32_pco_pmh_pu8_i32:
+	{
+		CObject *pObj = va_arg(ap, CObject *);
+		uint8_t *pBuf = va_arg(ap, uint8_t *);
+		int32_t nBufSize = va_arg(ap, int32_t);
+
+		i32_pco_pmh_pu8_i32 Proc = pEntry->m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pMsgHandleProc;
+		CObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pObject;
+		IMsgHead *pMsgHead = pEntry->m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pMsgHead;
+
+		uint32_t nOffset = 0;
+		if(pMsgHead->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		nRet = (pInstance->*Proc)(pObj, pMsgHead, pBuf, nBufSize);
 	}
 	break;
 	default:

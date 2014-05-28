@@ -11,7 +11,6 @@
 #include "../common/common_object.h"
 #include "../common/common_pool.h"
 #include "../common/common_rbtree.h"
-#include "../common/common_singleton.h"
 #include "../common/common_mutex.h"
 #include "../common/common_runnable.h"
 #include "frame_impl.h"
@@ -70,8 +69,6 @@ protected:
 	TimerMap				m_timerMap;
 
 };
-
-#define g_FrameTimerMgt		CSingleton<CTimerMgt>::GetInstance()
 
 FRAME_NAMESPACE_END
 

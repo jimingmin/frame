@@ -9,6 +9,7 @@
 #define FRAME_MSGENTRY_H_
 
 #include "../common/common_object.h"
+#include "../common/common_typedef.h"
 #include "frame_typedef.h"
 #include "frame_msghandle.h"
 #include "frame_namespace.h"
@@ -43,6 +44,14 @@ public:
 		m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgHandleProc = Proc;
 	}
 
+	MsgEntry(CObject *pObj, IMsgHead *pMsgHead, i32_pco_pmh_pu8_i32 Proc)
+	{
+		m_nProcCodeFlag = enmProcCodeFlag_i32_pco_pmh_pu8_i32;
+		m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pObject = pObj;
+		m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pMsgHead = pMsgHead;
+		m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pMsgHandleProc = Proc;
+	}
+
 	ProcCodeFlag	m_nProcCodeFlag;
 
 	struct EntryParam_i32_pco_pmh_pmb
@@ -67,11 +76,19 @@ public:
 		i32_pco_pmh_pmb_pu8_i32	m_pMsgHandleProc;
 	};
 
+	struct EntryParam_i32_pco_pmh_pu8_i32
+	{
+		CObject					*m_pObject;
+		IMsgHead				*m_pMsgHead;
+		i32_pco_pmh_pu8_i32		m_pMsgHandleProc;
+	};
+
 	union EntryParam
 	{
 		EntryParam_i32_pco_pmh_pmb 			EP_i32_pco_pmh_pmb;
 		EntryParam_i32_pco_pu8_i32			EP_i32_pco_pu8_i32;
 		EntryParam_i32_pco_pmh_pmb_pu8_i32	EP_i32_pco_pmh_pmb_pu8_i32;
+		EntryParam_i32_pco_pmh_pu8_i32		EP_i32_pco_pmh_pu8_i32;
 	} m_stEntryParam;
 };
 

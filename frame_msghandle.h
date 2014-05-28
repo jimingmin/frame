@@ -19,6 +19,7 @@ FRAME_NAMESPACE_BEGIN
 typedef int32_t (CObject::*i32_pco_pmh_pmb)(CObject *, IMsgHead *, IMsgBody *);
 typedef int32_t	(CObject::*i32_pco_pu8_i32)(CObject *, uint8_t *, int32_t);
 typedef int32_t (CObject::*i32_pco_pmh_pmb_pu8_i32)(CObject *, IMsgHead *, IMsgBody *, uint8_t *, int32_t);
+typedef int32_t (CObject::*i32_pco_pmh_pu8_i32)(CObject *, IMsgHead *, uint8_t *, int32_t);
 
 enum ProcCodeFlag
 {
@@ -26,10 +27,12 @@ enum ProcCodeFlag
 	enmProcCodeFlag_i32_pco_pmh_pmb				= 1,
 	enmProcCodeFlag_i32_pco_pu8_i32				= 2,
 	enmProcCodeFlag_i32_pco_pmh_pmb_pu8_i32		= 3,
+	enmProcCodeFlag_i32_pco_pmh_pu8_i32			= 4,
 };
 
+class CMsgMapDecl;
 
-int32_t FrameMsgCallBack(int32_t nMsgID, va_list ap);
+int32_t FrameMsgCallBack(CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap);
 
 
 FRAME_NAMESPACE_END
