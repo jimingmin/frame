@@ -43,6 +43,7 @@ public:
 
 	virtual int32_t Init();
 	virtual int32_t Uninit();
+	virtual int32_t GetSize();
 
 	void RegistConfig(const char *szConfigName, IConfig *pConfig);
 

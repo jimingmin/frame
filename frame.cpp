@@ -15,6 +15,7 @@ FRAME_NAMESPACE_BEGIN
 
 CFrame::CFrame()
 {
+	m_pTimerTask = new CFrameTimerTask();
 	m_pConfigMgt = new CFrameConfigMgt();
 	m_pTimerMgt = new CTimerMgt();
 }
@@ -36,6 +37,13 @@ int32_t CFrame::Init()
 
 	//定时器初始化
 	nRet = m_pTimerMgt->Init();
+	if(nRet != 0)
+	{
+		return nRet;
+	}
+
+	TimerIndex nTimerIndex = -1;
+	nRet = m_pTimerMgt->CreateTimer(static_cast<TimerProc>(&CFrameTimerTask::PrintMemInfo), m_pTimerTask, NULL, 60 * MS_PER_SECOND, true, nTimerIndex);
 	if(nRet != 0)
 	{
 		return nRet;

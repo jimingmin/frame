@@ -17,6 +17,7 @@
 #include "frame_msghandle.h"
 #include "frame_msgmap.h"
 #include "frame_configmgt.h"
+#include "frame_timertask.h"
 
 #include <list>
 using namespace std;
@@ -55,6 +56,7 @@ public:
 protected:
 	list<IRunnable *>		m_stRunnerList;
 	CMsgMapDecl				m_stMsgMap;
+	CFrameTimerTask			*m_pTimerTask;
 	CFrameConfigMgt			*m_pConfigMgt;
 	CTimerMgt				*m_pTimerMgt;
 };

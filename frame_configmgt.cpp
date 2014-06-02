@@ -33,6 +33,11 @@ int32_t CFrameConfigMgt::Uninit()
 	return 0;
 }
 
+int32_t CFrameConfigMgt::GetSize()
+{
+	return sizeof(*this);
+}
+
 void CFrameConfigMgt::RegistConfig(const char *szConfigName, IConfig *pConfig)
 {
 	if(GetConfig(szConfigName) != NULL)

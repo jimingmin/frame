@@ -34,12 +34,10 @@ public:
 	CTimerMgt();
 	virtual ~CTimerMgt();
 
-public:
 	virtual int32_t Init();
 	virtual int32_t Uninit();
 	virtual int32_t GetSize();
 
-public:
 	int32_t Run();
 
 	int32_t CreateTimer(TimerProc Proc, CObject *pTimer, CObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);

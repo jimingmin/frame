@@ -23,6 +23,19 @@ class IMsg : public CObject
 public:
 	virtual ~IMsg(){};
 
+	virtual int32_t Init()
+	{
+		return 0;
+	}
+	virtual int32_t Uninit()
+	{
+		return 0;
+	}
+	virtual int32_t GetSize()
+	{
+		return 0;
+	}
+
 	//virtual int32_t Encode(Value &value, Document::AllocatorType& allocator) = 0;
 	virtual int32_t Encode(uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
 

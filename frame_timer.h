@@ -17,6 +17,7 @@
 #include "frame_namespace.h"
 
 #include <stddef.h>
+#include <string.h>
 
 FRAME_NAMESPACE_BEGIN
 
@@ -70,7 +71,6 @@ public:
 	{
 	}
 
-public:
 
 	virtual int32_t Init()
 	{
@@ -88,7 +88,6 @@ public:
 		return sizeof(*this);
 	}
 
-public:
 	void SetTimer(const Timer& stTimer)
 	{
 		memcpy(&m_stTimer, &stTimer, sizeof(m_stTimer));
