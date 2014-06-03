@@ -31,8 +31,9 @@ enum ProcCodeFlag
 };
 
 class CMsgMapDecl;
+class CFrame;
 
-int32_t FrameMsgCallBack(CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap);
+int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap);
 
 
 FRAME_NAMESPACE_END

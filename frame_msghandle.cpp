@@ -8,12 +8,13 @@
 #include "frame_msgmap.h"
 #include "frame_msghandle.h"
 #include "frame_msgmap.h"
+#include "frame.h"
 
 #include <stddef.h>
 
 FRAME_NAMESPACE_BEGIN
 
-int32_t FrameMsgCallBack(CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap)
+int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap)
 {
 	MsgEntry *pEntry = stMsgMap.GetMsgEntry(nMsgID);
 	if(pEntry == NULL)
@@ -52,6 +53,8 @@ int32_t FrameMsgCallBack(CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap)
 			return 2;
 		}
 
+		pFrame->Dump(pMsgHead, pMsgBody, "recv ");
+
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pMsgBody);
 	}
 	break;
@@ -88,6 +91,8 @@ int32_t FrameMsgCallBack(CMsgMapDecl &stMsgMap, int32_t nMsgID, va_list ap)
 		{
 			return 2;
 		}
+
+		pFrame->Dump(pMsgHead, pMsgBody, "recv ");
 
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pMsgBody, pBuf, nBufSize);
 	}

@@ -30,7 +30,7 @@ public:
 	EXPORT CFrame();
 	EXPORT virtual ~CFrame();
 
-	EXPORT int32_t Init();
+	EXPORT int32_t Init(const char *szServerName);
 
 	EXPORT int32_t Uninit();
 
@@ -53,7 +53,10 @@ public:
 
 	EXPORT CMsgMapDecl &GetMsgMap();
 
+	EXPORT void Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix = "");
+
 protected:
+	string					m_strServerName;
 	list<IRunnable *>		m_stRunnerList;
 	CMsgMapDecl				m_stMsgMap;
 	CFrameTimerTask			*m_pTimerTask;

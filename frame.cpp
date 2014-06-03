@@ -7,9 +7,13 @@
 
 #include "frame.h"
 #include "frame_configmgt.h"
+#include "../logger/logger_writer.h"
+#include "../logger/logger.h"
 
 #include <stdarg.h>
 #include <stddef.h>
+
+using namespace LOGGER;
 
 FRAME_NAMESPACE_BEGIN
 
@@ -25,9 +29,12 @@ CFrame::~CFrame()
 
 }
 
-int32_t CFrame::Init()
+int32_t CFrame::Init(const char *szServerName)
 {
 	int32_t nRet = 0;
+
+	m_strServerName = szServerName;
+
 	//配置初始化
 	nRet = m_pConfigMgt->Init();
 	if(nRet != 0)
@@ -43,7 +50,8 @@ int32_t CFrame::Init()
 	}
 
 	TimerIndex nTimerIndex = -1;
-	nRet = m_pTimerMgt->CreateTimer(static_cast<TimerProc>(&CFrameTimerTask::PrintMemInfo), m_pTimerTask, NULL, 60 * MS_PER_SECOND, true, nTimerIndex);
+	CFrameTimerTask::CTimerTaskData *pTimerData = new CFrameTimerTask::CTimerTaskData(m_strServerName);
+	nRet = m_pTimerMgt->CreateTimer(static_cast<TimerProc>(&CFrameTimerTask::PrintMemInfo), m_pTimerTask, pTimerData, 60 * MS_PER_SECOND, true, nTimerIndex);
 	if(nRet != 0)
 	{
 		return nRet;
@@ -103,7 +111,7 @@ int32_t CFrame::FrameCallBack(int32_t nMsgID, ...)
 {
 	va_list ap;
 	va_start(ap, nMsgID);
-	int32_t nRet = FrameMsgCallBack(m_stMsgMap, nMsgID, ap);
+	int32_t nRet = FrameMsgCallBack(this, m_stMsgMap, nMsgID, ap);
 	va_end(ap);
 	return nRet;
 }
@@ -111,6 +119,22 @@ int32_t CFrame::FrameCallBack(int32_t nMsgID, ...)
 CMsgMapDecl &CFrame::GetMsgMap()
 {
 	return m_stMsgMap;
+}
+
+void CFrame::Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix)
+{
+	uint32_t nOffset = 0;
+	char arrLog[enmMaxLogStringLength];
+
+	nOffset = sprintf(arrLog, "%s", szPrefix);
+
+	pMsgHead->Dump(arrLog, sizeof(arrLog) - nOffset, nOffset);
+	pMsgBody->Dump(arrLog, sizeof(arrLog) - nOffset, nOffset);
+
+	int32_t nIndex = nOffset > enmMaxLogStringLength - 1 ? enmMaxLogStringLength - 1 : nOffset;
+	arrLog[nIndex] = '\0';
+
+	WRITE_INFO_LOG(m_strServerName.c_str(), "%s\n", arrLog);
 }
 
 //regist::regist(const char *szConfigName, IConfig *pConfig)
