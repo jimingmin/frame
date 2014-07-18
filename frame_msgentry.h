@@ -19,7 +19,7 @@ FRAME_NAMESPACE_BEGIN
 class MsgEntry
 {
 public:
-	MsgEntry(CObject *pObj, IMsgHead *pMsgHead, IMsgBody *pMsgBody, i32_pco_pmh_pmb Proc)
+	MsgEntry(CBaseObject *pObj, IMsgHead *pMsgHead, IMsgBody *pMsgBody, i32_pco_pmh_pmb Proc)
 	{
 		m_nProcCodeFlag = enmProcCodeFlag_i32_pco_pmh_pmb;
 		m_stEntryParam.EP_i32_pco_pmh_pmb.m_pObject = pObj;
@@ -28,14 +28,14 @@ public:
 		m_stEntryParam.EP_i32_pco_pmh_pmb.m_pMsgHandleProc = Proc;
 	}
 
-	MsgEntry(CObject *pObj, i32_pco_pu8_i32 Proc)
+	MsgEntry(CBaseObject *pObj, i32_pco_pu8_i32 Proc)
 	{
 		m_nProcCodeFlag = enmProcCodeFlag_i32_pco_pu8_i32;
 		m_stEntryParam.EP_i32_pco_pu8_i32.m_pObject = pObj;
 		m_stEntryParam.EP_i32_pco_pu8_i32.m_pMsgHandleProc = Proc;
 	}
 
-	MsgEntry(CObject *pObj, IMsgHead *pMsgHead, IMsgBody *pMsgBody, i32_pco_pmh_pmb_pu8_i32 Proc)
+	MsgEntry(CBaseObject *pObj, IMsgHead *pMsgHead, IMsgBody *pMsgBody, i32_pco_pmh_pmb_pu8_i32 Proc)
 	{
 		m_nProcCodeFlag = enmProcCodeFlag_i32_pco_pmh_pmb_pu8_i32;
 		m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pObject = pObj;
@@ -44,7 +44,7 @@ public:
 		m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgHandleProc = Proc;
 	}
 
-	MsgEntry(CObject *pObj, IMsgHead *pMsgHead, i32_pco_pmh_pu8_i32 Proc)
+	MsgEntry(CBaseObject *pObj, IMsgHead *pMsgHead, i32_pco_pmh_pu8_i32 Proc)
 	{
 		m_nProcCodeFlag = enmProcCodeFlag_i32_pco_pmh_pu8_i32;
 		m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pObject = pObj;
@@ -56,7 +56,7 @@ public:
 
 	struct EntryParam_i32_pco_pmh_pmb
 	{
-		CObject			*m_pObject;
+		CBaseObject			*m_pObject;
 		IMsgHead		*m_pMsgHead;
 		IMsgBody		*m_pMsgBody;
 		i32_pco_pmh_pmb	m_pMsgHandleProc;
@@ -64,13 +64,13 @@ public:
 
 	struct EntryParam_i32_pco_pu8_i32
 	{
-		CObject			*m_pObject;
+		CBaseObject			*m_pObject;
 		i32_pco_pu8_i32	m_pMsgHandleProc;
 	};
 
 	struct EntryParam_i32_pco_pmh_pmb_pu8_i32
 	{
-		CObject					*m_pObject;
+		CBaseObject					*m_pObject;
 		IMsgHead				*m_pMsgHead;
 		IMsgBody				*m_pMsgBody;
 		i32_pco_pmh_pmb_pu8_i32	m_pMsgHandleProc;
@@ -78,7 +78,7 @@ public:
 
 	struct EntryParam_i32_pco_pmh_pu8_i32
 	{
-		CObject					*m_pObject;
+		CBaseObject					*m_pObject;
 		IMsgHead				*m_pMsgHead;
 		i32_pco_pmh_pu8_i32		m_pMsgHandleProc;
 	};

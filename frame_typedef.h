@@ -18,7 +18,7 @@ FRAME_NAMESPACE_BEGIN
 
 #define MODULE_NAME		"frame"
 
-class IMsg : public CObject
+class IMsg : public CBaseObject
 {
 public:
 	virtual ~IMsg(){};

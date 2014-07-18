@@ -39,25 +39,25 @@ public:
 		return 0;
 	}
 
-	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, IMsgBody *pMsgBody, CObject *pObj, i32_pco_pmh_pmb Proc)
+	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, IMsgBody *pMsgBody, CBaseObject *pObj, i32_pco_pmh_pmb Proc)
 	{
 		MsgEntry *pMsgEntry = new MsgEntry(pObj, pMsgHead, pMsgBody, Proc);
 		m_stMsgMap[nMsgID] = pMsgEntry;
 	}
 
-	void RegistMsgEntry(uint32_t nMsgID, CObject *pObj, i32_pco_pu8_i32 Proc)
+	void RegistMsgEntry(uint32_t nMsgID, CBaseObject *pObj, i32_pco_pu8_i32 Proc)
 	{
 		MsgEntry *pMsgEntry = new MsgEntry(pObj, Proc);
 		m_stMsgMap[nMsgID] = pMsgEntry;
 	}
 
-	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, IMsgBody *pMsgBody, CObject *pObj, i32_pco_pmh_pmb_pu8_i32 Proc)
+	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, IMsgBody *pMsgBody, CBaseObject *pObj, i32_pco_pmh_pmb_pu8_i32 Proc)
 	{
 		MsgEntry *pMsgEntry = new MsgEntry(pObj, pMsgHead, pMsgBody, Proc);
 		m_stMsgMap[nMsgID] = pMsgEntry;
 	}
 
-	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, CObject *pObj, i32_pco_pmh_pu8_i32 Proc)
+	void RegistMsgEntry(uint32_t nMsgID, IMsgHead *pMsgHead, CBaseObject *pObj, i32_pco_pmh_pu8_i32 Proc)
 	{
 		MsgEntry *pMsgEntry = new MsgEntry(pObj, pMsgHead, Proc);
 		m_stMsgMap[nMsgID] = pMsgEntry;

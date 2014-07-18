@@ -29,7 +29,7 @@ public:
 	IConfig		*m_pConfig;
 };
 
-class CFrameConfigMgt : public CObject
+class CFrameConfigMgt : public CBaseObject
 {
 	enum
 	{

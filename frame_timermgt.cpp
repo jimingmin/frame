@@ -46,7 +46,7 @@ int32_t CTimerMgt::GetSize()
 	return sizeof(*this);
 }
 
-int32_t CTimerMgt::CreateTimer(TimerProc Proc, CObject *pTimer, CObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex)
+int32_t CTimerMgt::CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex)
 {
 	uint8_t *pObj = NULL;
 	if(pTimerData != NULL)
@@ -300,7 +300,7 @@ int32_t CTimerMgt::Run()
 	uint32_t nTimerSeq = pTimer->GetTimerSeq();
 
 	//外部Timer直接回调接口
-	CObject *pHandler = pTimer->GetTimerHandler();
+	CBaseObject *pHandler = pTimer->GetTimerHandler();
 	if( NULL != pHandler)
 	{
 		TimerProc proc = pTimer->GetEventProc();

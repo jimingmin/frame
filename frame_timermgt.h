@@ -23,7 +23,7 @@ FRAME_NAMESPACE_BEGIN
 typedef CPool<CTimer, MAX_TIMER_COUNT>	TimerPool;
 typedef CRBTree<int64_t, TimerIndex, MAX_TIMER_COUNT>	TimerMap;
 
-class CTimerMgt : public CObject, public IRunnable
+class CTimerMgt : public CBaseObject, public IRunnable
 {
 protected:
 	enum
@@ -40,7 +40,7 @@ public:
 
 	int32_t Run();
 
-	int32_t CreateTimer(TimerProc Proc, CObject *pTimer, CObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
+	int32_t CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
 
 	int32_t RemoveTimer(TimerIndex timerIndex);
 

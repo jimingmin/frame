@@ -8,7 +8,7 @@
 #ifndef FRAME_H_
 #define FRAME_H_
 
-#include "../common/common_singleton.h"
+//#include "../common/common_singleton.h"
 #include "../common/common_typedef.h"
 #include "../common/common_export.h"
 #include "frame_impl.h"
@@ -19,6 +19,7 @@
 #include "frame_configmgt.h"
 #include "frame_timertask.h"
 
+#include <signal.h>
 #include <list>
 using namespace std;
 
@@ -38,7 +39,7 @@ public:
 
 	EXPORT void AddRunner(IRunnable *pRunner);
 
-	EXPORT int32_t CreateTimer(TimerProc Proc, CObject *pTimer, CObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
+	EXPORT int32_t CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
 
 	EXPORT int32_t RemoveTimer(TimerIndex timerIndex);
 
@@ -55,6 +56,8 @@ public:
 
 	EXPORT void Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix = "");
 
+	EXPORT int32_t InitSig();
+
 protected:
 	string					m_strServerName;
 	list<IRunnable *>		m_stRunnerList;
@@ -64,19 +67,19 @@ protected:
 	CTimerMgt				*m_pTimerMgt;
 };
 
-#define g_Frame		CSingleton<CFrame>::GetInstance()
-
-class EXPORT regist
-{
-public:
-	regist(const char *szConfigName, IConfig *pConfig)
-	{
-		g_Frame.RegistConfig(szConfigName, pConfig);
-	}
-};
-
-#define REGIST_CONFIG(config_name, config_class)	\
-	static regist reg_##config_class(config_name, new config_class(config_name))
+//#define g_Frame		CSingleton<CFrame>::GetInstance()
+//
+//class EXPORT regist
+//{
+//public:
+//	regist(const char *szConfigName, IConfig *pConfig)
+//	{
+//		g_Frame.RegistConfig(szConfigName, pConfig);
+//	}
+//};
+//
+//#define REGIST_CONFIG(config_name, config_class)	\
+//	static regist reg_##config_class(config_name, new config_class(config_name))
 
 #define MSGMAP_BEGIN(entity)	\
 class CMsgMapDecl_##entity	\

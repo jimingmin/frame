@@ -33,12 +33,12 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 	{
 	case enmProcCodeFlag_i32_pco_pmh_pmb:
 	{
-		CObject *pObj = va_arg(ap, CObject *);
+		CBaseObject *pObj = va_arg(ap, CBaseObject *);
 		uint8_t *pBuf = va_arg(ap, uint8_t *);
 		int32_t nBufSize = va_arg(ap, int32_t);
 
 		i32_pco_pmh_pmb Proc = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb.m_pMsgHandleProc;
-		CObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb.m_pObject;
+		CBaseObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb.m_pObject;
 		IMsgHead *pMsgHead = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb.m_pMsgHead;
 		IMsgBody *pMsgBody = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb.m_pMsgBody;
 
@@ -60,24 +60,24 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 	break;
 	case enmProcCodeFlag_i32_pco_pu8_i32:
 	{
-		CObject *pObj = va_arg(ap, CObject *);
+		CBaseObject *pObj = va_arg(ap, CBaseObject *);
 		uint8_t *pBuf = va_arg(ap, uint8_t *);
 		int32_t nBufSize = va_arg(ap, int32_t);
 
 		i32_pco_pu8_i32 Proc = pEntry->m_stEntryParam.EP_i32_pco_pu8_i32.m_pMsgHandleProc;
-		CObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pu8_i32.m_pObject;
+		CBaseObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pu8_i32.m_pObject;
 
 		nRet = (pInstance->*Proc)(pObj, pBuf, nBufSize);
 	}
 	break;
 	case enmProcCodeFlag_i32_pco_pmh_pmb_pu8_i32:
 	{
-		CObject *pObj = va_arg(ap, CObject *);
+		CBaseObject *pObj = va_arg(ap, CBaseObject *);
 		uint8_t *pBuf = va_arg(ap, uint8_t *);
 		int32_t nBufSize = va_arg(ap, int32_t);
 
 		i32_pco_pmh_pmb_pu8_i32 Proc = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgHandleProc;
-		CObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pObject;
+		CBaseObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pObject;
 		IMsgHead *pMsgHead = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgHead;
 		IMsgBody *pMsgBody = pEntry->m_stEntryParam.EP_i32_pco_pmh_pmb_pu8_i32.m_pMsgBody;
 
@@ -99,12 +99,12 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 	break;
 	case enmProcCodeFlag_i32_pco_pmh_pu8_i32:
 	{
-		CObject *pObj = va_arg(ap, CObject *);
+		CBaseObject *pObj = va_arg(ap, CBaseObject *);
 		uint8_t *pBuf = va_arg(ap, uint8_t *);
 		int32_t nBufSize = va_arg(ap, int32_t);
 
 		i32_pco_pmh_pu8_i32 Proc = pEntry->m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pMsgHandleProc;
-		CObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pObject;
+		CBaseObject *pInstance = pEntry->m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pObject;
 		IMsgHead *pMsgHead = pEntry->m_stEntryParam.EP_i32_pco_pmh_pu8_i32.m_pMsgHead;
 
 		uint32_t nOffset = 0;

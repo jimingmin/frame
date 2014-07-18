@@ -16,10 +16,10 @@
 
 FRAME_NAMESPACE_BEGIN
 
-typedef int32_t (CObject::*i32_pco_pmh_pmb)(CObject *, IMsgHead *, IMsgBody *);
-typedef int32_t	(CObject::*i32_pco_pu8_i32)(CObject *, uint8_t *, int32_t);
-typedef int32_t (CObject::*i32_pco_pmh_pmb_pu8_i32)(CObject *, IMsgHead *, IMsgBody *, uint8_t *, int32_t);
-typedef int32_t (CObject::*i32_pco_pmh_pu8_i32)(CObject *, IMsgHead *, uint8_t *, int32_t);
+typedef int32_t (CBaseObject::*i32_pco_pmh_pmb)(CBaseObject *, IMsgHead *, IMsgBody *);
+typedef int32_t	(CBaseObject::*i32_pco_pu8_i32)(CBaseObject *, uint8_t *, int32_t);
+typedef int32_t (CBaseObject::*i32_pco_pmh_pmb_pu8_i32)(CBaseObject *, IMsgHead *, IMsgBody *, uint8_t *, int32_t);
+typedef int32_t (CBaseObject::*i32_pco_pmh_pu8_i32)(CBaseObject *, IMsgHead *, uint8_t *, int32_t);
 
 enum ProcCodeFlag
 {

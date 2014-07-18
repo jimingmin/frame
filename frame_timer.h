@@ -27,7 +27,7 @@ typedef int32_t					TimerIndex;
 typedef TimerIndex				TimerID;
 
 //定时器回调例程
-typedef int32_t (CObject::*TimerProc)(CTimer *pTimer);
+typedef int32_t (CBaseObject::*TimerProc)(CTimer *pTimer);
 
 class EXPORT Timer
 {
@@ -50,7 +50,7 @@ public:
 
 	void					*pData;
 	uint32_t				nTimerSeq;
-	CObject					*pTimerHandler;
+	CBaseObject					*pTimerHandler;
 	TimerProc				pTimerProc;
 	int64_t					nStartTime;
 	int64_t					nCycleTime;
@@ -61,7 +61,7 @@ public:
 	uint32_t                attachedDataB;
 };
 
-class EXPORT CTimer : public CObject
+class EXPORT CTimer : public CBaseObject
 {
 public:
 	CTimer()
@@ -128,7 +128,7 @@ public:
 		return m_stTimer.pTimerProc;
 	}
 
-	CObject* GetTimerHandler()
+	CBaseObject* GetTimerHandler()
 	{
 		return m_stTimer.pTimerHandler;
 	}

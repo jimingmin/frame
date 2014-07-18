@@ -59,6 +59,8 @@ int32_t CFrame::Init(const char *szServerName)
 
 	AddRunner(m_pTimerMgt);
 
+	InitSig();
+
 	return 0;
 }
 
@@ -68,6 +70,10 @@ int32_t CFrame::Uninit()
 	m_pConfigMgt->Uninit();
 	//定时器卸载
 	m_pTimerMgt->Uninit();
+
+	delete m_pTimerTask;
+	delete m_pConfigMgt;
+	delete m_pTimerMgt;
 	return 0;
 }
 
@@ -78,16 +84,19 @@ void CFrame::AddRunner(IRunnable *pRunner)
 
 int32_t CFrame::Run()
 {
-	list<IRunnable *>::iterator it = m_stRunnerList.begin();
-	for(; it != m_stRunnerList.end(); ++it)
+	while(true)
 	{
-		(*it)->Run();
+		list<IRunnable *>::iterator it = m_stRunnerList.begin();
+		for(; it != m_stRunnerList.end(); ++it)
+		{
+			(*it)->Run();
+		}
 	}
 
 	return 0;
 }
 
-int32_t CFrame::CreateTimer(TimerProc Proc, CObject *pTimer, CObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex)
+int32_t CFrame::CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex)
 {
 	return m_pTimerMgt->CreateTimer(Proc, pTimer, pTimerData, nCycleTime, bLoop, timerIndex);
 }
@@ -141,5 +150,27 @@ void CFrame::Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix)
 //{
 //	g_Frame.RegistConfig(szConfigName, pConfig);
 //}
+
+int32_t CFrame::InitSig()
+{
+#ifdef unix
+	signal(SIGINT,  SIG_IGN);
+	signal(SIGHUP,  SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGPIPE, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	signal(SIGCHLD, SIG_IGN);
+	signal(SIGTERM, SIG_IGN);
+	signal(SIGHUP,  SIG_IGN);
+
+	struct sigaction sig;
+	sig.sa_handler = SIG_IGN;
+	sigemptyset(&sig.sa_mask);
+	sig.sa_flags = 0;
+	sigaction(SIGPIPE, &sig, NULL);
+#endif
+	return 0;
+}
 
 FRAME_NAMESPACE_END
