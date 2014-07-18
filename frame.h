@@ -78,9 +78,9 @@ protected:
 //	}
 //};
 //
-//#define REGIST_CONFIG(config_name, config_class)	\
-//	static regist reg_##config_class(config_name, new config_class(config_name))
-
+/*#define REGIST_CONFIG(config_name, config_class)	\
+	static regist reg_##config_class(config_name, new config_class(config_name))
+*/
 #define MSGMAP_BEGIN(entity)	\
 class CMsgMapDecl_##entity	\
 {	\
