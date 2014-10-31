@@ -11,8 +11,8 @@
 #include "../common/common_object.h"
 #include "frame_namespace.h"
 
-#include "../rapidjson/document.h"
-using namespace rapidjson;
+//#include "../rapidjson/document.h"
+//using namespace rapidjson;
 
 FRAME_NAMESPACE_BEGIN
 

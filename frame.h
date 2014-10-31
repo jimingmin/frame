@@ -67,20 +67,20 @@ protected:
 	CTimerMgt				*m_pTimerMgt;
 };
 
-//#define g_Frame		CSingleton<CFrame>::GetInstance()
-//
-//class EXPORT regist
-//{
-//public:
-//	regist(const char *szConfigName, IConfig *pConfig)
-//	{
-//		g_Frame.RegistConfig(szConfigName, pConfig);
-//	}
-//};
-//
-/*#define REGIST_CONFIG(config_name, config_class)	\
+#define g_Frame		CSingleton<CFrame>::GetInstance()
+
+class EXPORT regist
+{
+public:
+	regist(const char *szConfigName, IConfig *pConfig)
+	{
+		g_Frame.RegistConfig(szConfigName, pConfig);
+	}
+};
+
+#define REGIST_CONFIG(config_name, config_class)	\
 	static regist reg_##config_class(config_name, new config_class(config_name))
-*/
+
 #define MSGMAP_BEGIN(entity)	\
 class CMsgMapDecl_##entity	\
 {	\
