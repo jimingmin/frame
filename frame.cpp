@@ -12,7 +12,9 @@
 
 #include <stdarg.h>
 #include <stddef.h>
-
+#ifdef unix
+#include <unistd.h>
+#endif
 using namespace LOGGER;
 
 FRAME_NAMESPACE_BEGIN
@@ -29,7 +31,7 @@ CFrame::~CFrame()
 
 }
 
-int32_t CFrame::Init(const char *szServerName)
+int32_t CFrame::Init(const char *szServerName, bool bDaemon/* = false*/)
 {
 	int32_t nRet = 0;
 
@@ -58,6 +60,11 @@ int32_t CFrame::Init(const char *szServerName)
 	}
 
 	AddRunner(m_pTimerMgt);
+
+	if(bDaemon)
+	{
+		SetDaemon();
+	}
 
 	InitSig();
 
@@ -150,6 +157,28 @@ void CFrame::Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix)
 //{
 //	g_Frame.RegistConfig(szConfigName, pConfig);
 //}
+
+int32_t CFrame::SetDaemon()
+{
+#ifdef unix
+	pid_t pid = 0;
+
+	if ((pid = fork()) != 0)
+	{
+		exit(0);
+	}
+
+	setsid();
+
+	if ((pid = fork()) != 0)
+	{
+		exit(0);
+	}
+
+	umask(0);
+#endif
+	return 0;
+}
 
 int32_t CFrame::InitSig()
 {

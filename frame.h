@@ -31,7 +31,7 @@ public:
 	EXPORT CFrame();
 	EXPORT virtual ~CFrame();
 
-	EXPORT int32_t Init(const char *szServerName);
+	EXPORT int32_t Init(const char *szServerName, bool bDaemon = false);
 
 	EXPORT int32_t Uninit();
 
@@ -57,6 +57,9 @@ public:
 	EXPORT void Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix = "");
 
 	EXPORT int32_t InitSig();
+
+protected:
+	EXPORT int32_t SetDaemon();
 
 protected:
 	string					m_strServerName;
