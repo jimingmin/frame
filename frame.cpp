@@ -14,6 +14,8 @@
 #include <stddef.h>
 #ifdef unix
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #endif
 using namespace LOGGER;
 
