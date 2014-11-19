@@ -8,6 +8,7 @@
 #include "../logger/logger.h"
 #include "frame_typedef.h"
 #include "frame_configmgt.h"
+#include <string.h>
 
 using namespace LOGGER;
 
