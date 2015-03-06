@@ -9,6 +9,7 @@
 #include "frame_configmgt.h"
 #include "../logger/logger_writer.h"
 #include "../logger/logger.h"
+#include "../common/common_codeengine.h"
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -202,6 +203,33 @@ int32_t CFrame::InitSig()
 	sigaction(SIGPIPE, &sig, NULL);
 #endif
 	return 0;
+}
+
+int32_t CFrame::SendMsg(IIOSession *pIoSession, IMsgHead *pMsgHead, IMsgBody *pMsgBody)
+{
+	uint32_t nOffset = 0;
+	uint8_t arrMsgBuf[64 * 1024];
+	int32_t nRet = pMsgHead->Encode(arrMsgBuf, sizeof(arrMsgBuf), nOffset);
+	if(nRet != 0)
+	{
+		return 0;
+	}
+
+	nRet = pMsgBody->Encode(arrMsgBuf, sizeof(arrMsgBuf), nOffset);
+	if(nRet != 0)
+	{
+		return 0;
+	}
+
+	uint16_t nTotalSize = (uint16_t)nOffset;
+	nOffset = 0;
+	nRet = CCodeEngine::Encode(arrMsgBuf, sizeof(arrMsgBuf), nOffset, nTotalSize);
+	if(nRet != 0)
+	{
+		return 0;
+	}
+
+	return pIoSession->Write(arrMsgBuf, nTotalSize);
 }
 
 FRAME_NAMESPACE_END

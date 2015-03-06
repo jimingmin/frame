@@ -11,6 +11,7 @@
 //#include "../common/common_singleton.h"
 #include "../common/common_typedef.h"
 #include "../common/common_export.h"
+#include "../netevent/net_impl.h"
 #include "frame_impl.h"
 #include "frame_namespace.h"
 #include "frame_timermgt.h"
@@ -22,6 +23,7 @@
 #include <signal.h>
 #include <list>
 using namespace std;
+using namespace NETEVENT;
 
 FRAME_NAMESPACE_BEGIN
 
@@ -57,6 +59,8 @@ public:
 	EXPORT void Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix = "");
 
 	EXPORT int32_t InitSig();
+
+	EXPORT int32_t SendMsg(IIOSession *pIoSession, IMsgHead *pMsgHead, IMsgBody *pMsgBody);
 
 protected:
 	EXPORT int32_t SetDaemon();
