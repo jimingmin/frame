@@ -9,36 +9,21 @@
 #define FRAME_CONFIGMGT_H_
 
 #include "../common/common_object.h"
-#include "../common/common_singleton.h"
 #include "frame_impl.h"
 #include "frame_namespace.h"
 
+#include <map>
 #include <string>
 using namespace std;
 
 FRAME_NAMESPACE_BEGIN
 
-class ConfigInfo
-{
-public:
-	ConfigInfo()
-	{
-		m_pConfig = NULL;
-	}
-	string		m_strConfigName;
-	IConfig		*m_pConfig;
-};
-
 class CFrameConfigMgt : public CBaseObject
 {
-	enum
-	{
-		enmMaxConfigInfoSize	= 32,	//最大的配置文件数量
-	};
+	typedef map<string, IConfig *>		ConfigMgt;
 public:
 	CFrameConfigMgt()
 	{
-		m_nConfigCount = 0;
 	}
 
 	virtual int32_t Init();
@@ -50,8 +35,7 @@ public:
 	IConfig *GetConfig(const char *szConfigName);
 
 protected:
-	int32_t			m_nConfigCount;
-	ConfigInfo		m_arrConfigInfo[enmMaxConfigInfoSize];
+	ConfigMgt		m_stConfigMgt;
 };
 
 FRAME_NAMESPACE_END

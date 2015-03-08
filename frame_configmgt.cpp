@@ -8,7 +8,6 @@
 #include "../logger/logger.h"
 #include "frame_typedef.h"
 #include "frame_configmgt.h"
-#include <string.h>
 
 using namespace LOGGER;
 
@@ -16,12 +15,13 @@ FRAME_NAMESPACE_BEGIN
 
 int32_t CFrameConfigMgt::Init()
 {
-	for(int32_t i = 0; i < m_nConfigCount; ++i)
+	ConfigMgt::iterator it = m_stConfigMgt.begin();
+	for(; it != m_stConfigMgt.end(); ++it)
 	{
-		int32_t nRet = m_arrConfigInfo[i].m_pConfig->Init();
+		int32_t nRet = it->second->Init();
 		if(nRet != 0)
 		{
-			WRITE_WARN_LOG(MODULE_NAME, "init %s error!\n", m_arrConfigInfo[i].m_strConfigName.c_str());
+			WRITE_WARN_LOG(MODULE_NAME, "init config %s error!\n", it->first.c_str());
 			return 1;
 		}
 	}
@@ -46,19 +46,16 @@ void CFrameConfigMgt::RegistConfig(const char *szConfigName, IConfig *pConfig)
 		return;
 	}
 
-	m_arrConfigInfo[m_nConfigCount].m_pConfig = pConfig;
-	m_arrConfigInfo[m_nConfigCount].m_strConfigName = szConfigName;
-	++m_nConfigCount;
+	m_stConfigMgt[szConfigName] = pConfig;
 }
 
 IConfig *CFrameConfigMgt::GetConfig(const char *szConfigName)
 {
-	for(int32_t i = 0; i < m_nConfigCount; ++i)
+
+	ConfigMgt::iterator it = m_stConfigMgt.find(szConfigName);
+	if(it != m_stConfigMgt.end())
 	{
-		if(strncmp(szConfigName, m_arrConfigInfo[i].m_strConfigName.c_str(), m_arrConfigInfo[i].m_strConfigName.length()) == 0)
-		{
-			return m_arrConfigInfo[i].m_pConfig;
-		}
+		return it->second;
 	}
 
 	return NULL;
