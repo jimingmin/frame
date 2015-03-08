@@ -11,6 +11,7 @@
 #include "../common/common_codeengine.h"
 #include "frame_namespace.h"
 #include "frame_typedef.h"
+#include <stdio.h>
 
 FRAME_NAMESPACE_BEGIN
 
