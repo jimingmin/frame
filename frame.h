@@ -8,7 +8,7 @@
 #ifndef FRAME_H_
 #define FRAME_H_
 
-//#include "../common/common_singleton.h"
+#include "../common/common_singleton.h"
 #include "../common/common_typedef.h"
 #include "../common/common_export.h"
 #include "../netevent/net_impl.h"
@@ -19,6 +19,8 @@
 #include "frame_msgmap.h"
 #include "frame_configmgt.h"
 #include "frame_timertask.h"
+#include "frame_bankmgt.h"
+#include "frame_macrodefine.h"
 
 #include <signal.h>
 #include <list>
@@ -48,6 +50,10 @@ public:
 	EXPORT void RegistConfig(const char *szConfigName, IConfig *pConfig);
 
 	EXPORT IConfig *GetConfig(const char *szConfigName);
+
+	EXPORT void RegistBank(const char *szBankName, IBank *pBank);
+
+	EXPORT IBank *GetBank(const char *szBankName);
 	/*
 	 * 返回值:	1:not found msg handler
 	 * 			2:decode msg failed
@@ -72,76 +78,16 @@ protected:
 	CFrameTimerTask			*m_pTimerTask;
 	CFrameConfigMgt			*m_pConfigMgt;
 	CTimerMgt				*m_pTimerMgt;
+	CFrameBankMgt			*m_pBankMgt;
 };
 
 #define g_Frame		CSingleton<CFrame>::GetInstance()
 
-class EXPORT regist
-{
-public:
-	regist(const char *szConfigName, IConfig *pConfig)
-	{
-		g_Frame.RegistConfig(szConfigName, pConfig);
-	}
-};
+REGIST_CLASS(Config, const char *, IConfig *)
+#define REGIST_CONFIG(config_name, config_class)	static regist_Config reg_##config_class(config_name, new config_class(config_name));
 
-#define REGIST_CONFIG(config_name, config_class)	\
-	static regist reg_##config_class(config_name, new config_class(config_name))
-
-#define MSGMAP_BEGIN(entity)	\
-class CMsgMapDecl_##entity	\
-{	\
-public:	\
-	CMsgMapDecl_##entity()	\
-{	\
-	DeclMsgMap();	\
-}	\
-	~CMsgMapDecl_##entity()	\
-{	\
-}	\
-	void DeclMsgMap()	\
-{
-
-#define ON_PROC_PMH_PMB(id, msghead, msgbody, obj, msgproc)	\
-	g_Frame.GetMsgMap().RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb>(&msgproc));
-
-#define ON_PROC_PMH_PMB_PU8_I32(id, msghead, msgbody, obj, msgproc)	\
-	g_Frame.GetMsgMap().RegistMsgEntry(id, new msghead(), new msgbody(), new obj(), static_cast<i32_pco_pmh_pmb_pu8_i32>(&msgproc));
-
-#define ON_PROC_PMH_PU8_I32(id, msghead, obj, msgproc)	\
-	g_Frame.GetMsgMap().RegistMsgEntry(id, new msghead(), new obj(), static_cast<i32_pco_pmh_pu8_i32>(&msgproc));
-
-#define ON_STREAMEVENT(id, obj, msgproc)	\
-	g_Frame.GetMsgMap().RegistMsgEntry(id, new obj(), static_cast<i32_pco_pu8_i32>(&msgproc));
-
-#define ON_MSG_EVENT(id, msgproc)	\
-	g_Frame.GetMsgMap().RegistMsgEntry(id, msgproc);
-
-#define MSGMAP_END(entity)	\
-}	\
-};	\
-	static CMsgMapDecl_##entity l_##entity;
-
-
-#define DECLARE_MSG_MAP() \
-protected:\
-	static CMsgMapDecl* GetMyMsgMap(); \
-	virtual CMsgMapDecl* GetMsgMap();
-
-#define BEGIN_MSG_MAP(cls)	\
-		CMsgMapDecl* cls::GetMsgMap()	\
-		{	\
-			return GetMyMsgMap();	\
-		}	\
-		CMsgMapDecl* cls::GetMyMsgMap()	\
-		{	\
-			static CMsgMapDecl stMsgMap;
-
-//#define ON_MSG_EVENT(id, proc)
-
-#define END_MSG_MAP()	\
-			return &stMsgMap;	\
-		};
+REGIST_CLASS(Bank, const char *, IBank *)
+#define REGIST_BANK(bank_name, bank_class)		static regist_Bank reg_##bank_class(bank_name, new bank_class());
 
 FRAME_NAMESPACE_END
 

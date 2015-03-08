@@ -26,6 +26,18 @@ public:
 	virtual int32_t Uninit() = 0;
 };
 
+class EXPORT IBank
+{
+public:
+	IBank(){};
+	virtual ~IBank(){};
+
+	//初始化
+	virtual int32_t Init() = 0;
+	//卸载
+	virtual int32_t Uninit() = 0;
+};
+
 FRAME_NAMESPACE_END
 
 #endif /* FRAME_IMPL_H_ */

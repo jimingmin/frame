@@ -22,11 +22,17 @@ using namespace LOGGER;
 
 FRAME_NAMESPACE_BEGIN
 
+CFrame &GetFrameInstance()
+{
+	return g_Frame;
+}
+
 CFrame::CFrame()
 {
 	m_pTimerTask = new CFrameTimerTask();
 	m_pConfigMgt = new CFrameConfigMgt();
 	m_pTimerMgt = new CTimerMgt();
+	m_pBankMgt = new CFrameBankMgt();
 }
 
 CFrame::~CFrame()
@@ -42,6 +48,12 @@ int32_t CFrame::Init(const char *szServerName, bool bDaemon/* = false*/)
 
 	//配置初始化
 	nRet = m_pConfigMgt->Init();
+	if(nRet != 0)
+	{
+		return nRet;
+	}
+
+	nRet = m_pBankMgt->Init();
 	if(nRet != 0)
 	{
 		return nRet;
@@ -118,12 +130,22 @@ int32_t CFrame::RemoveTimer(TimerIndex timerIndex)
 
 void CFrame::RegistConfig(const char *szConfigName, IConfig *pConfig)
 {
-	return m_pConfigMgt->RegistConfig(szConfigName, pConfig);
+	m_pConfigMgt->RegistConfig(szConfigName, pConfig);
 }
 
 IConfig *CFrame::GetConfig(const char *szConfigName)
 {
 	return m_pConfigMgt->GetConfig(szConfigName);
+}
+
+void CFrame::RegistBank(const char *szBankName, IBank *pBank)
+{
+	m_pBankMgt->RegistBank(szBankName, pBank);
+}
+
+IBank *CFrame::GetBank(const char *szBankName)
+{
+	return m_pBankMgt->GetBank(szBankName);
 }
 
 int32_t CFrame::FrameCallBack(int32_t nMsgID, ...)
