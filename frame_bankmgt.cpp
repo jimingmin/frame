@@ -6,7 +6,7 @@
  */
 
 #include "../logger/logger.h"
-#include "frame_typedef.h"
+#include "frame_define.h"
 #include "frame_bankmgt.h"
 
 using namespace LOGGER;
