@@ -8,13 +8,14 @@
 #ifndef FRAME_IMPL_H_
 #define FRAME_IMPL_H_
 
+#include "../common/common_object.h"
 #include "../common/common_typedef.h"
 #include "../common/common_export.h"
 #include "frame_namespace.h"
 
 FRAME_NAMESPACE_BEGIN
 
-class EXPORT IConfig
+class EXPORT IConfig : public CBaseObject
 {
 public:
 	IConfig(){};
@@ -24,9 +25,14 @@ public:
 	virtual int32_t Init() = 0;
 	//卸载配置
 	virtual int32_t Uninit() = 0;
+
+	virtual int32_t GetSize()
+	{
+		return 0;
+	}
 };
 
-class EXPORT IBank
+class EXPORT IBank : public CBaseObject
 {
 public:
 	IBank(){};
@@ -36,6 +42,70 @@ public:
 	virtual int32_t Init() = 0;
 	//卸载
 	virtual int32_t Uninit() = 0;
+
+	virtual int32_t GetSize()
+	{
+		return 0;
+	}
+};
+
+class IMsg : public CBaseObject
+{
+public:
+	virtual ~IMsg(){};
+
+	virtual int32_t Init()
+	{
+		return 0;
+	}
+	virtual int32_t Uninit()
+	{
+		return 0;
+	}
+	virtual int32_t GetSize()
+	{
+		return 0;
+	}
+
+	//virtual int32_t Encode(Value &value, Document::AllocatorType& allocator) = 0;
+	virtual int32_t Encode(uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
+
+	virtual int32_t Decode(const uint8_t *pBuf, const int32_t nBufSize, uint32_t &nOffset) = 0;
+
+	virtual void Dump(char* buf, const uint32_t size, uint32_t& offset) = 0;
+};
+
+typedef IMsg	IMsgHead;
+typedef IMsg	IMsgBody;
+typedef IMsg	ICtlHead;
+
+class IRedisReplyHandler : public CBaseObject
+{
+public:
+	IRedisReplyHandler()
+	{
+		Init();
+	}
+
+	virtual ~IRedisReplyHandler()
+	{
+		Uninit();
+	}
+
+	virtual int32_t Init()
+	{
+		return 0;
+	}
+	virtual int32_t Uninit()
+	{
+		return 0;
+	}
+	virtual int32_t GetSize()
+	{
+		return 0;
+	}
+
+	virtual int32_t OnRedisReply(int32_t nResult, void *pReply, CBaseObject *pParam) = 0;
 };
 
 FRAME_NAMESPACE_END
