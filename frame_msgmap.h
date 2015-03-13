@@ -63,6 +63,18 @@ public:
 		m_stMsgMap[nMsgID] = pMsgEntry;
 	}
 
+	void RegistMsgEntry(uint32_t nMsgID, ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, CBaseObject *pObj, i32_pch_pmh_pmb_pu8_i32 Proc)
+	{
+		MsgEntry *pMsgEntry = new MsgEntry(pObj, pCtlHead, pMsgHead, pMsgBody, Proc);
+		m_stMsgMap[nMsgID] = pMsgEntry;
+	}
+
+	void RegistMsgEntry(uint32_t nMsgID, ICtlHead *pCtlHead, IMsgHead *pMsgHead, CBaseObject *pObj, i32_pch_pmh_pu8_i32 Proc)
+	{
+		MsgEntry *pMsgEntry = new MsgEntry(pObj, pCtlHead, pMsgHead, Proc);
+		m_stMsgMap[nMsgID] = pMsgEntry;
+	}
+
 	void Clear()
 	{
 		m_stMsgMap.clear();

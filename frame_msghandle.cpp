@@ -7,7 +7,6 @@
 
 #include "frame_msgmap.h"
 #include "frame_msghandle.h"
-#include "frame_msgmap.h"
 #include "frame.h"
 
 #include <stddef.h>
@@ -114,6 +113,62 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 		}
 
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pBuf, nBufSize);
+	}
+	break;
+	case enmProcCodeFlag_i32_pch_pmh_pmb_pu8_i32:
+	{
+		uint8_t *pBuf = va_arg(ap, uint8_t *);
+		int32_t nBufSize = va_arg(ap, int32_t);
+
+		i32_pch_pmh_pmb_pu8_i32 Proc = pEntry->m_stEntryParam.EP_i32_pch_pmh_pmb_pu8_i32.m_pMsgHandleProc;
+		CBaseObject *pInstance = pEntry->m_stEntryParam.EP_i32_pch_pmh_pmb_pu8_i32.m_pObject;
+		ICtlHead *pCtlHead = pEntry->m_stEntryParam.EP_i32_pch_pmh_pmb_pu8_i32.m_pCtlHead;
+		IMsgHead *pMsgHead = pEntry->m_stEntryParam.EP_i32_pch_pmh_pmb_pu8_i32.m_pMsgHead;
+		IMsgBody *pMsgBody = pEntry->m_stEntryParam.EP_i32_pch_pmh_pmb_pu8_i32.m_pMsgBody;
+
+		uint32_t nOffset = 0;
+		if(pCtlHead->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		if(pMsgHead->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		if(pMsgBody->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		pFrame->Dump(pMsgHead, pMsgBody, "recv ");
+
+		nRet = (pInstance->*Proc)(pCtlHead, pMsgHead, pMsgBody, pBuf, nBufSize);
+	}
+	break;
+	case enmProcCodeFlag_i32_pch_pmh_pu8_i32:
+	{
+		uint8_t *pBuf = va_arg(ap, uint8_t *);
+		int32_t nBufSize = va_arg(ap, int32_t);
+
+		i32_pch_pmh_pu8_i32 Proc = pEntry->m_stEntryParam.EP_i32_pch_pmh_pu8_i32.m_pMsgHandleProc;
+		CBaseObject *pInstance = pEntry->m_stEntryParam.EP_i32_pch_pmh_pu8_i32.m_pObject;
+		ICtlHead *pCtlHead = pEntry->m_stEntryParam.EP_i32_pch_pmh_pu8_i32.m_pCtlHead;
+		IMsgHead *pMsgHead = pEntry->m_stEntryParam.EP_i32_pch_pmh_pu8_i32.m_pMsgHead;
+
+		uint32_t nOffset = 0;
+		if(pCtlHead->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		if(pMsgHead->Decode(pBuf, nBufSize, nOffset) != 0)
+		{
+			return 2;
+		}
+
+		nRet = (pInstance->*Proc)(pCtlHead, pMsgHead, pBuf, nBufSize);
 	}
 	break;
 	default:

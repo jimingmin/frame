@@ -9,7 +9,7 @@
 #define FRAME_MSGHANDLE_H_
 
 #include "../common/common_object.h"
-#include "frame_typedef.h"
+#include "frame_impl.h"
 #include "frame_namespace.h"
 
 #include <stdarg.h>
@@ -20,6 +20,8 @@ typedef int32_t (CBaseObject::*i32_pco_pmh_pmb)(CBaseObject *, IMsgHead *, IMsgB
 typedef int32_t	(CBaseObject::*i32_pco_pu8_i32)(CBaseObject *, uint8_t *, int32_t);
 typedef int32_t (CBaseObject::*i32_pco_pmh_pmb_pu8_i32)(CBaseObject *, IMsgHead *, IMsgBody *, uint8_t *, int32_t);
 typedef int32_t (CBaseObject::*i32_pco_pmh_pu8_i32)(CBaseObject *, IMsgHead *, uint8_t *, int32_t);
+typedef int32_t (CBaseObject::*i32_pch_pmh_pmb_pu8_i32)(ICtlHead *, IMsgHead *, IMsgBody *, uint8_t *, int32_t);
+typedef int32_t (CBaseObject::*i32_pch_pmh_pu8_i32)(ICtlHead *, IMsgHead *, uint8_t *, int32_t);
 
 enum ProcCodeFlag
 {
@@ -28,6 +30,8 @@ enum ProcCodeFlag
 	enmProcCodeFlag_i32_pco_pu8_i32				= 2,
 	enmProcCodeFlag_i32_pco_pmh_pmb_pu8_i32		= 3,
 	enmProcCodeFlag_i32_pco_pmh_pu8_i32			= 4,
+	enmProcCodeFlag_i32_pch_pmh_pmb_pu8_i32		= 5,
+	enmProcCodeFlag_i32_pch_pmh_pu8_i32			= 6,
 };
 
 class CMsgMapDecl;
