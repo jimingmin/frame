@@ -10,10 +10,12 @@
 
 #include "../common/common_codeengine.h"
 #include "frame_namespace.h"
-#include "frame_typedef.h"
+#include "frame_impl.h"
 #include <stdio.h>
 
 FRAME_NAMESPACE_BEGIN
+
+#define MODULE_NAME			"frame"
 
 class MsgHead : public IMsgHead
 {
@@ -89,7 +91,7 @@ public:
 	virtual void Dump(char* buf, const uint32_t size, uint32_t& nOffset)
 	{
 		uint32_t nLen = sprintf(buf, "msghead={m_nTotalSize=%d, m_nMsgID=%d, m_nSeq=%u, m_nSrcUin=%u, m_nDstUin=%u}",
-				&m_nTotalSize, &m_nMsgID, &m_nSeq, &m_nSrcUin, &m_nDstUin);
+				m_nTotalSize, m_nMsgID, m_nSeq, m_nSrcUin, m_nDstUin);
 		nOffset += nLen;
 	}
 };
