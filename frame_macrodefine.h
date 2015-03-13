@@ -67,6 +67,13 @@ public:	\
 #define ON_MSG_EVENT(id, msgproc)	\
 	g_Frame.GetMsgMap().RegistMsgEntry(id, msgproc);
 
+#define ON_PROC_PCH_PMH_PMB_PU8_I32(id, ctlhead, msghead, msgbody, obj, msgproc)	\
+	g_Frame.GetMsgMap().RegistMsgEntry(id, new ctlhead(), new msghead(), new msgbody(), new obj(), static_cast<i32_pch_pmh_pmb_pu8_i32>(&msgproc));
+
+#define ON_PROC_PCH_PMH_PU8_I32(id, ctlhead, msghead, obj, msgproc)	\
+	g_Frame.GetMsgMap().RegistMsgEntry(id, new ctlhead(), new msghead(), new obj(), static_cast<i32_pch_pmh_pu8_i32>(&msgproc));
+
+
 #define MSGMAP_END(entity)	\
 }	\
 };	\
