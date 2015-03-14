@@ -11,6 +11,17 @@
 
 static char g_arrSSKey[16] = {'v', 'd', 'c', '$', 'a', 'u', 't', 'h', '@', '1', '7','9','.', 'c', 'o', 'm'};
 
+void CServerHelper::FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize, ControlCode nCtlCode, uint32_t nUin, SessionID nSessionID,
+			uint32_t nClientAddress, uint16_t nClientPort)
+{
+	stCtlHead.m_nTotalSize = nTotalSize;
+	stCtlHead.m_nControlCode = nCtlCode;
+	stCtlHead.m_nUin = nUin;
+	stCtlHead.m_nSessionID = nSessionID;
+	stCtlHead.m_nClientAddress = nClientAddress;
+	stCtlHead.m_nClientPort = nClientPort;
+}
+
 int32_t CServerHelper::MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, uint8_t *pOutBuf, int32_t nOutBufSize)
 {
 //	ControlHead *pControlHead = (ControlHead *)pCtlHead;
