@@ -9,6 +9,7 @@
 #include <string.h>
 #include "redis_agent.h"
 #include "redis_glue.h"
+#include "redis_session.h"
 #include "frame.h"
 #include "../logger/logger.h"
 #include "../common/common_memmgt.h"
@@ -44,9 +45,14 @@ int32_t CRedisAgent::Run()
 	return event_base_loop(m_pRedisEvtBase, EVLOOP_NONBLOCK);
 }
 
-int32_t CRedisAgent::ConnectSuccess()
+int32_t CRedisAgent::OnConnected()
 {
 	return 0;
+}
+
+void CRedisAgent::OnClosed()
+{
+
 }
 
 int32_t CRedisAgent::Connect()
@@ -80,108 +86,12 @@ void CRedisAgent::Close()
 	redisAsyncDisconnect(m_pRedisContext);
 }
 
-int32_t CRedisAgent::RPush(char *szKey, char *pValue, uint16_t nValueLen, IRedisReplyHandler *pReplyHandler/* = NULL*/, CBaseObject *pParam/* = NULL*/)
+bool CRedisAgent::IsConnected()
 {
-	RedisCmdSession *pSession = NULL;
-	if(pReplyHandler != NULL)
-	{
-		pSession = NEW(RedisCmdSession);
-		pSession->m_strKey = string(szKey);
-		pSession->m_pRSCallback = pReplyHandler;
-		pSession->m_pParam = pParam;
-		pSession->m_nRCSessionType = enmRCSessionType_Short;
-	}
-	return SendCommand("RPUSH", szKey, pValue, nValueLen, pSession);
+	return m_bConnectSuccess;
 }
 
-int32_t CRedisAgent::LPop(char *szKey, IRedisReplyHandler *pReplyHandler/* = NULL*/, CBaseObject *pParam/* = NULL*/)
-{
-	RedisCmdSession *pSession = NULL;
-	if(pReplyHandler != NULL)
-	{
-		pSession = NEW(RedisCmdSession);
-		pSession->m_strKey = string(szKey);
-		pSession->m_pRSCallback = pReplyHandler;
-		pSession->m_pParam = pParam;
-		pSession->m_nRCSessionType = enmRCSessionType_Short;
-	}
-	return SendCommand("LPOP", szKey, pSession);
-}
-
-int32_t CRedisAgent::Subscribe(char *szKey, IRedisReplyHandler *pReplyHandler/* = NULL*/, CBaseObject *pParam/* = NULL*/)
-{
-	RedisCmdSession *pSession = NULL;
-	if(pReplyHandler != NULL)
-	{
-		pSession = NEW(RedisCmdSession);
-		pSession->m_strKey = string(szKey);
-		pSession->m_pRSCallback = pReplyHandler;
-		pSession->m_pParam = pParam;
-		pSession->m_nRCSessionType = enmRCSessionType_Long;
-		m_stLongSessionList.push_back(pSession);
-	}
-	return SendCommand("SUBSCRIBE", szKey, pSession);
-}
-
-int32_t CRedisAgent::Unsubscribe(char *szKey, IRedisReplyHandler *pReplyHandler/* = NULL*/, CBaseObject *pParam/* = NULL*/)
-{
-	RedisCmdSession *pSession = NULL;
-	if(pReplyHandler != NULL)
-	{
-		pSession = NEW(RedisCmdSession);
-		pSession->m_strKey = string(szKey);
-		pSession->m_pRSCallback = pReplyHandler;
-		pSession->m_pParam = pParam;
-		pSession->m_nRCSessionType = enmRCSessionType_Short;
-		m_stLongSessionList.push_back(pSession);
-	}
-	return SendCommand(&CRedisGlue::CB_UnsubscribeReply, pSession, "%s %s", "UNSUBSCRIBE", szKey);
-}
-
-void CRedisAgent::OnUnsubscribeReply(const redisAsyncContext *pContext, void *pReply, void *pSession)
-{
-	if(pSession == NULL)
-	{
-		return;
-	}
-//
-//    if (pReply == NULL)
-//    {
-//    	return;
-//    }
-//
-//    redisReply *pRedisReply = (redisReply *)pReply;
-    RedisCmdSession *pRedisSession = (RedisCmdSession *)pSession;
-
-    //删除订阅到长会话对象
-    for(list<RedisCmdSession *>::iterator it = m_stLongSessionList.begin(); it != m_stLongSessionList.end();)
-    {
-    	if((*it)->m_strKey == pRedisSession->m_strKey)
-    	{
-    		DELETE((*it));
-    		it = m_stLongSessionList.erase(it);
-    	}
-    	else
-    	{
-    		++it;
-    	}
-    }
-}
-
-int32_t CRedisAgent::Publish(char *szKey, char *pValue, uint16_t nValueLen, IRedisReplyHandler *pReplyHandler/* = NULL*/, CBaseObject *pParam/* = NULL*/)
-{
-	RedisCmdSession *pSession = NULL;
-	if(pReplyHandler != NULL)
-	{
-		pSession = NEW(RedisCmdSession);
-		pSession->m_pRSCallback = pReplyHandler;
-		pSession->m_pParam = pParam;
-		pSession->m_nRCSessionType = enmRCSessionType_Short;
-	}
-	return SendCommand("PUBLISH", szKey, pValue, nValueLen, pSession);
-}
-
-void CRedisAgent::OnConnected(const redisAsyncContext *pContext, int32_t nStatus)
+void CRedisAgent::Connected(const redisAsyncContext *pContext, int32_t nStatus)
 {
     if (nStatus != REDIS_OK) {
 		WRITE_WARN_LOG(MODULE_NAME, "connect redis failed!{error=%s, server_id=%d, address=%s, port=%d}\n",
@@ -193,11 +103,13 @@ void CRedisAgent::OnConnected(const redisAsyncContext *pContext, int32_t nStatus
 
     m_bConnectSuccess = true;
 
-    ConnectSuccess();
+    OnConnected();
 }
 
-void CRedisAgent::OnClosed(const redisAsyncContext *pContext, int32_t nStatus)
+void CRedisAgent::Closed(const redisAsyncContext *pContext, int32_t nStatus)
 {
+	OnClosed();
+
 	m_bConnectSuccess = false;
 
     if (nStatus != REDIS_OK) {
@@ -210,11 +122,6 @@ void CRedisAgent::OnClosed(const redisAsyncContext *pContext, int32_t nStatus)
         m_pRedisEvtBase = NULL;
         m_pRedisContext = NULL;
         return;
-    }
-    //删除与redis保持长会话的对象
-    for(list<RedisCmdSession *>::iterator it = m_stLongSessionList.begin(); it != m_stLongSessionList.end(); ++it)
-    {
-    	DELETE((*it));
     }
 
     WRITE_INFO_LOG(MODULE_NAME, "redis connection is closed!{server_id=%d, address=%s, port=%d}\n", m_nServerID, m_arrAddress, m_nPort);
@@ -239,46 +146,84 @@ void CRedisAgent::OnRedisReply(const redisAsyncContext *pContext, void *pReply, 
     }
 
     redisReply *pRedisReply = (redisReply *)pReply;
-    RedisCmdSession *pRedisSession = (RedisCmdSession *)pSession;
+    RedisSession *pRedisSession = (RedisSession *)pSession;
+    CBaseObject *pHandler = pRedisSession->GetHandlerObj();
+    HandleRedisReply Proc = pRedisSession->GetHandleRedisReply();
 
-    pRedisSession->OnSession(pContext->err, pReply);
-
-    if(pRedisSession->m_nRCSessionType == enmRCSessionType_Short)
-    {
-    	DELETE(pRedisSession);
-    }
+    (pHandler->*Proc)(pContext->err, pReply, pRedisSession);
 }
 
-bool CRedisAgent::IsConnected()
+void CRedisAgent::OnUnsubscribeReply(const redisAsyncContext *pContext, void *pReply, void *pSession)
 {
-	return m_bConnectSuccess;
-}
 
-int32_t CRedisAgent::SendCommand(redisCallbackFn *pFunc, void *pSession, const char *szFormat, ...)
-{
-    va_list ap;
-
-    va_start(ap, szFormat);
-    int32_t nStatus = redisvAsyncCommand(m_pRedisContext, pFunc, pSession, szFormat, ap);
-    va_end(ap);
-
-	return nStatus;
-}
-
-int32_t CRedisAgent::SendCommand(const char *szCommand, char *pKey, char *pValue, uint16_t nValueLen,
-		redisCallbackFn *pFunc/* = NULL*/, void *pSession/* = NULL*/)
-{
-	return SendCommand(pFunc, pSession, "%s %b %b", szCommand, pKey, strlen(pKey), pValue, nValueLen);
 }
 
 int32_t CRedisAgent::SendCommand(const char *szCommand, char *pKey, void *pSession/* = NULL*/)
 {
-	return redisAsyncCommand(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSession, "%s %b", szCommand, pKey, strlen(pKey));
+	int32_t nStatus;
+	if(pSession == NULL)
+	{
+		nStatus = redisAsyncCommand(m_pRedisContext, NULL, NULL, "%s %b", szCommand, pKey, strlen(pKey));
+	}
+	else
+	{
+		nStatus = redisAsyncCommand(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSession, "%s %b", szCommand, pKey, strlen(pKey));
+	}
+
+	return nStatus;
 }
 
-int32_t CRedisAgent::SendCommand(const char *szCommand, char *pKey, char *pValue, uint16_t nValueLen, void *pSession/* = NULL*/)
+int32_t CRedisAgent::SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, va_list ap)
 {
-	return redisAsyncCommand(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSession, "%s %s %b", szCommand, pKey, pValue, (size_t)nValueLen);
+    char *pCmd;
+    int32_t nLen;
+    int32_t nStatus;
+    nLen = redisvFormatCommand(&pCmd,szFormat,ap);
+
+    /* We don't want to pass -1 or -2 to future functions as a length. */
+    if (nLen < 0)
+        return REDIS_ERR;
+
+    char szCmd[10 * 1024];
+    char *pEnd = strchr(pCmd, '\r');
+    if((pEnd == NULL) && (pCmd != NULL))
+    {
+    	free(pCmd);
+    	return 0;
+    }
+
+    int32_t nIndex = pEnd - pCmd;
+    pCmd[nIndex] = '\0';
+    int32_t nRowCount = atoi(&pCmd[1]);
+    int32_t nCmdLen = sprintf(szCmd, "*%d\r\n$%d\r\n%s\r\n$%d\r\n%s", nRowCount + 2, strlen(szCommand), szCommand, strlen(szKey), szKey);
+    pCmd[nIndex] = '\r';
+    memcpy(&szCmd[nCmdLen], &pCmd[nIndex], nLen - nIndex);
+
+    size_t nTotalSize = nCmdLen + nLen - nIndex;
+    szCmd[nTotalSize] = '\0';
+
+    if(pSession == NULL)
+    {
+    	nStatus = redisAsyncFormattedCommand(m_pRedisContext, NULL, NULL, szCmd, nTotalSize);
+    }
+    else
+    {
+		nStatus = redisAsyncFormattedCommand(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSession, szCmd, nTotalSize);
+    }
+
+    free(pCmd);
+
+    return nStatus;
+}
+
+int32_t CRedisAgent::SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, ...)
+{
+    va_list ap;
+    va_start(ap, szFormat);
+    int32_t nStatus = SendCommand(szCommand, szKey, pSession, szFormat, ap);
+    va_end(ap);
+
+	return nStatus;
 }
 
 FRAME_NAMESPACE_END

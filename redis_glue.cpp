@@ -42,7 +42,7 @@ void CRedisGlue::CB_Connect(const redisAsyncContext *pContext, int32_t nStatus)
 	map<const redisAsyncContext*, CRedisAgent *>::iterator it = CRedisGlue::m_stRedisContextMap.find(pContext);
 	if(it != CRedisGlue::m_stRedisContextMap.end())
 	{
-		it->second->OnConnected(pContext, nStatus);
+		it->second->Connected(pContext, nStatus);
 	}
 	else
 	{
@@ -55,7 +55,7 @@ void CRedisGlue::CB_Close(const redisAsyncContext *pContext, int32_t nStatus)
 	map<const redisAsyncContext*, CRedisAgent *>::iterator it = CRedisGlue::m_stRedisContextMap.find(pContext);
 	if(it != CRedisGlue::m_stRedisContextMap.end())
 	{
-		it->second->OnClosed(pContext, nStatus);
+		it->second->Closed(pContext, nStatus);
 	}
 	else
 	{

@@ -15,20 +15,10 @@
 #include "../hiredis/async.h"
 #include "../hiredis/adapters/libevent.h"
 #include "frame_namespace.h"
-#include "redis_define.h"
 #include <list>
 using namespace std;
 
 FRAME_NAMESPACE_BEGIN
-
-#define REDIS_CMD_GET			"GET"
-#define REDIS_CMD_SET			"SET"
-
-#define REDIS_CMD_RPUSH			"RPUSH"
-#define REDIS_CMD_LLEN			"LLEN"
-
-#define REDIS_CMD_SUBSCRIBE		"SUBSCRIBE"
-#define REDIS_CMD_UNSUBSCRIBE	"UNSUBSCRIBE"
 
 enum
 {
@@ -37,6 +27,7 @@ enum
 
 class CRedisAgent : public IRunnable
 {
+	friend class CRedisGlue;
 public:
 	CRedisAgent(int32_t nServerID, char *pAddress, uint16_t nPort);
 
@@ -44,42 +35,31 @@ public:
 
 	virtual int32_t Run();
 
-	virtual int32_t ConnectSuccess();
+	virtual int32_t OnConnected();
+
+	virtual void OnClosed();
+
+	virtual void OnUnsubscribeReply(const redisAsyncContext *pContext, void *pReply, void *pSession);
 
 	int32_t Connect();
 
 	void Close();
 
-	//----------------------------list-----------------------------------------
-	int32_t RPush(char *szKey, char *pValue, uint16_t nValueLen, IRedisReplyHandler *pReplyHandler = NULL, CBaseObject *pParam = NULL);
-
-	int32_t LPop(char *szKey, IRedisReplyHandler *pReplyHandler = NULL, CBaseObject *pParam = NULL);
-
-	//----------------------------sub/pub--------------------------------------
-	int32_t Subscribe(char *szKey, IRedisReplyHandler *pReplyHandler = NULL, CBaseObject *pParam = NULL);
-
-	int32_t Unsubscribe(char *szKey, IRedisReplyHandler *pReplyHandler = NULL, CBaseObject *pParam = NULL);
-
-	void OnUnsubscribeReply(const redisAsyncContext *pContext, void *pReply, void *pSession);
-
-	int32_t Publish(char *szKey, char *pValue, uint16_t nValueLen, IRedisReplyHandler *pReplyHandler = NULL, CBaseObject *pParam = NULL);
-
-	void OnConnected(const redisAsyncContext *pContext, int32_t nStatus);
-
-	void OnClosed(const redisAsyncContext *pContext, int32_t nStatus);
-
-	void OnRedisReply(const redisAsyncContext *pContext, void *pReply, void *pSession);
-
 	bool IsConnected();
 
 protected:
-	int32_t SendCommand(redisCallbackFn *pFunc, void *pSession, const char *szFormat, ...);
 
-	int32_t SendCommand(const char *szCommand, char *pKey, char *pValue, uint16_t nValueLen, redisCallbackFn *pFunc = NULL, void *pSession = NULL);
+	void Connected(const redisAsyncContext *pContext, int32_t nStatus);
 
-	int32_t SendCommand(const char *szCommand, char *pKey, void *pSession = NULL);
+	void Closed(const redisAsyncContext *pContext, int32_t nStatus);
 
-	int32_t SendCommand(const char *szCommand, char *pKey, char *pValue, uint16_t nValueLen, void *pSession = NULL);
+	void OnRedisReply(const redisAsyncContext *pContext, void *pReply, void *pSession);
+
+	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession = NULL);
+
+	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, va_list ap);
+
+	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, ...);
 
 private:
 	bool					m_bConnectSuccess;
@@ -88,7 +68,6 @@ private:
 	uint16_t				m_nPort;
 	event_base 				*m_pRedisEvtBase;
 	redisAsyncContext		*m_pRedisContext;
-	list<RedisCmdSession *>	m_stLongSessionList;
 };
 
 FRAME_NAMESPACE_END
