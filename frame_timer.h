@@ -21,13 +21,11 @@
 
 FRAME_NAMESPACE_BEGIN
 
-class CTimer;
-
 typedef int32_t					TimerIndex;
 typedef TimerIndex				TimerID;
 
 //定时器回调例程
-typedef int32_t (CBaseObject::*TimerProc)(CTimer *pTimer);
+typedef int32_t (CBaseObject::*TimerProc)(void *pTimerData);
 
 class EXPORT Timer
 {
@@ -103,9 +101,19 @@ public:
 		return m_stTimer.pData;
 	}
 
+	void SetEndTime(int64_t nEndTime)
+	{
+		m_stTimer.nEndTime = nEndTime;
+	}
+
 	int64_t GetEndTime()
 	{
 		return m_stTimer.nEndTime;
+	}
+
+	int64_t GetCycleTime()
+	{
+		return m_stTimer.nCycleTime;
 	}
 
 	uint32_t GetTimerSeq()
@@ -121,6 +129,11 @@ public:
 	uint32_t GetFiredCount()
 	{
 		return m_stTimer.nFiredCount;
+	}
+
+	void SetEventProc(TimerProc Proc)
+	{
+		m_stTimer.pTimerProc = Proc;
 	}
 
 	TimerProc GetEventProc()
