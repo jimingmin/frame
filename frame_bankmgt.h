@@ -11,7 +11,6 @@
 #include "../common/common_object.h"
 #include "frame_impl.h"
 #include "frame_namespace.h"
-#include "frame_bank.h"
 #include <map>
 #include <string>
 using namespace std;

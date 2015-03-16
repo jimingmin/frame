@@ -10,7 +10,6 @@
 
 #include "../common/common_object.h"
 #include "frame_namespace.h"
-#include "frame_timer.h"
 #include <string>
 using namespace std;
 
@@ -65,7 +64,7 @@ public:
 		return sizeof(*this);
 	}
 
-	int32_t PrintMemInfo(CTimer *pTimer);
+	int32_t PrintMemInfo(void *pTimerData);
 };
 
 FRAME_NAMESPACE_END

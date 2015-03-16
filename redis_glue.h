@@ -8,7 +8,7 @@
 #ifndef REDIS_GLUE_H_
 #define REDIS_GLUE_H_
 
-#include "redis_agent.h"
+#include "redis_raw.h"
 #include "../hiredis/hiredis.h"
 #include "frame_namespace.h"
 #include "frame_impl.h"
@@ -26,7 +26,7 @@ public:
 
 	~CRedisGlue();
 
-	static void RegRedisContext(redisAsyncContext *pContext, CRedisAgent *pAgent);
+	static void RegRedisContext(redisAsyncContext *pContext, CRedisRaw *pAgent);
 
 	static void UnregRedisContext(redisAsyncContext *pContext);
 
@@ -39,7 +39,7 @@ public:
 	static void CB_UnsubscribeReply(redisAsyncContext *pContext, void *pReply, void *pSession);
 
 private:
-	static map<const redisAsyncContext*, CRedisAgent *>	m_stRedisContextMap;
+	static map<const redisAsyncContext*, CRedisRaw *>	m_stRedisContextMap;
 };
 
 FRAME_NAMESPACE_END
