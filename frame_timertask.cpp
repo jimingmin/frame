@@ -15,9 +15,9 @@ using namespace LOGGER;
 
 FRAME_NAMESPACE_BEGIN
 
-int32_t CFrameTimerTask::PrintMemInfo(CTimer *pTimer)
+int32_t CFrameTimerTask::PrintMemInfo(void *pTimerData)
 {
-	CTimerTaskData *pTimerData = (CTimerTaskData *)pTimer->GetTimerData();
+	CTimerTaskData *pTimerTaskData = (CTimerTaskData *)pTimerData;
 	//WRITE_INFO_LOG(pTimerData->m_strServerName.c_str(), "%s", GetMemInfo());
 
 	return 0;
