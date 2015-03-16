@@ -7,7 +7,7 @@
 
 #include "../common/common_datetime.h"
 #include "../common/common_errordef.h"
-#include "../common/common_memmgt.h"
+//#include "../common/common_memmgt.h"
 #include "frame_timermgt.h"
 
 FRAME_NAMESPACE_BEGIN
@@ -48,22 +48,22 @@ int32_t CTimerMgt::GetSize()
 
 int32_t CTimerMgt::CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex)
 {
-	uint8_t *pObj = NULL;
-	if(pTimerData != NULL)
-	{
-		int32_t nTimerDataSize = pTimerData->GetSize();
-		pObj = MALLOC(nTimerDataSize);
-		if(pObj == NULL)
-		{
-			return E_MALLOCFAILED;
-		}
-
-		memcpy(pObj, pTimerData, nTimerDataSize);
-	}
+//	uint8_t *pObj = NULL;
+//	if(pTimerData != NULL)
+//	{
+//		int32_t nTimerDataSize = pTimerData->GetSize();
+//		pObj = MALLOC(nTimerDataSize);
+//		if(pObj == NULL)
+//		{
+//			return E_MALLOCFAILED;
+//		}
+//
+//		memcpy(pObj, pTimerData, nTimerDataSize);
+//	}
 
 	//初始化定时器参数
 	Timer timer;
-	timer.pData = pObj;
+	timer.pData = pTimerData;
 	timer.nStartTime = CTimeValue::CurrentTime().Milliseconds();
 	timer.nCycleTime = nCycleTime;
 	timer.nEndTime = timer.nStartTime + timer.nCycleTime;
@@ -82,7 +82,7 @@ int32_t CTimerMgt::CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject 
 	TimerPool::CIndex* pIndex = m_timerPool.CreateObject();
 	if (NULL == pIndex)
 	{
-		FREE(pObj);
+		//FREE(pObj);
 		return E_CREATEOBJECT;
 	}
 
@@ -90,7 +90,7 @@ int32_t CTimerMgt::CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject 
 	TimerMap::CIndex* pMapIndex = m_timerMap.Insert(timer.nEndTime, pIndex->Index());
 	if (NULL == pMapIndex)
 	{
-		FREE(pObj);
+		//FREE(pObj);
 		m_timerPool.DestroyObject(pIndex);
 		pIndex = NULL;
 		return E_INSERTMAP;
@@ -100,7 +100,7 @@ int32_t CTimerMgt::CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject 
 	int32_t ret = pIndex->SetAdditionalData(enmAdditionalIndex_RBTreeIndex, (uint64_t)pMapIndex);
 	if (0 > ret)
 	{
-		FREE(pObj);
+		//FREE(pObj);
 		m_timerMap.Erase(pMapIndex);
 		m_timerPool.DestroyObject(pIndex);
 		pIndex = NULL;
@@ -178,13 +178,13 @@ int32_t CTimerMgt::RemoveTimer(TimerPool::CIndex* pIndex)
 	{
 		return E_UNKNOWN;
 	}
-	//回收定时器所申请的内存资源
-	Timer timer;
-	pTimer->GetTimer(timer);
-	if(timer.pData != NULL)
-	{
-		FREE((uint8_t *)timer.pData);
-	}
+//	//回收定时器所申请的内存资源
+//	Timer timer;
+//	pTimer->GetTimer(timer);
+//	if(timer.pData != NULL)
+//	{
+//		FREE((uint8_t *)timer.pData);
+//	}
 
 	uint64_t nAddtionalValue = 0;
 	pIndex->GetAdditionalData(enmAdditionalIndex_RBTreeIndex, nAddtionalValue);
@@ -306,7 +306,7 @@ int32_t CTimerMgt::Run()
 		TimerProc proc = pTimer->GetEventProc();
 		if(proc != NULL)
 		{
-			(pHandler->*proc)(pTimer);
+			(pHandler->*proc)(pTimer->GetTimerData());
 		}
 	}
 
