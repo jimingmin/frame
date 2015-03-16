@@ -45,7 +45,9 @@ public:
 
 	EXPORT int32_t CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
 
-	EXPORT int32_t RemoveTimer(TimerIndex timerIndex);
+	EXPORT CTimer *GetTimer(TimerIndex nTimerIndex);
+
+	EXPORT int32_t RemoveTimer(TimerIndex nTimerIndex);
 
 	EXPORT void RegistConfig(const char *szConfigName, IConfig *pConfig);
 

@@ -123,6 +123,13 @@ int32_t CFrame::CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pT
 	return m_pTimerMgt->CreateTimer(Proc, pTimer, pTimerData, nCycleTime, bLoop, timerIndex);
 }
 
+CTimer *CFrame::GetTimer(TimerIndex nTimerIndex)
+{
+	CTimer *pTimer = NULL;
+	m_pTimerMgt->GetTimer(nTimerIndex, pTimer);
+	return pTimer;
+}
+
 int32_t CFrame::RemoveTimer(TimerIndex timerIndex)
 {
 	return m_pTimerMgt->RemoveTimer(timerIndex);
