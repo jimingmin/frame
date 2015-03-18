@@ -64,6 +64,8 @@ protected:
 
 	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, ...);
 
+	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession, int32_t nArgc, const char **Argv, const size_t *ArgvLen);
+
 	int32_t SendFormatedCommand(void *pSession, char *szCommand, int32_t nCmdLen);
 
 private:

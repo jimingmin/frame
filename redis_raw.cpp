@@ -262,6 +262,23 @@ int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSessio
 	return nStatus;
 }
 
+int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSession, int32_t nArgc, const char **Argv, const size_t *ArgvLen)
+{
+	int32_t nStatus;
+	if(pSession == NULL)
+	{
+		nStatus = redisAsyncCommandArgv(m_pRedisContext, NULL, NULL, nArgc, Argv, ArgvLen);
+	}
+	else
+	{
+    	uint32_t *pSessionIndex = ((CSessionIndexBank *)g_Frame.GetBank(BANK_SESSION_INDEX))->CreateSessionIndex();
+    	*pSessionIndex = ((RedisSession *)pSession)->GetSessionIndex();
+		nStatus = redisAsyncCommandArgv(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSessionIndex, nArgc, Argv, ArgvLen);
+	}
+
+	return nStatus;
+}
+
 int32_t CRedisRaw::SendFormatedCommand(void *pSession, char *szCommand, int32_t nCmdLen)
 {
 	int32_t nStatus;
