@@ -169,15 +169,27 @@ CMsgMapDecl &CFrame::GetMsgMap()
 	return m_stMsgMap;
 }
 
-void CFrame::Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix)
+void CFrame::Dump(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix)
 {
 	uint32_t nOffset = 0;
 	char arrLog[enmMaxLogStringLength];
 
 	nOffset = sprintf(arrLog, "%s", szPrefix);
 
-	pMsgHead->Dump(arrLog, sizeof(arrLog) - nOffset, nOffset);
-	pMsgBody->Dump(arrLog, sizeof(arrLog) - nOffset, nOffset);
+	if(pCtlHead != NULL)
+	{
+		pCtlHead->Dump(arrLog, sizeof(arrLog), nOffset);
+	}
+
+	if(pMsgHead != NULL)
+	{
+		pMsgHead->Dump(arrLog, sizeof(arrLog), nOffset);
+	}
+
+	if(pMsgBody != NULL)
+	{
+		pMsgBody->Dump(arrLog, sizeof(arrLog), nOffset);
+	}
 
 	int32_t nIndex = nOffset > enmMaxLogStringLength - 1 ? enmMaxLogStringLength - 1 : nOffset;
 	arrLog[nIndex] = '\0';

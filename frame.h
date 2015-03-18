@@ -64,7 +64,7 @@ public:
 
 	EXPORT CMsgMapDecl &GetMsgMap();
 
-	EXPORT void Dump(IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix = "");
+	EXPORT void Dump(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, const char *szPrefix = "");
 
 	EXPORT int32_t InitSig();
 
