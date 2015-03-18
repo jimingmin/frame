@@ -52,7 +52,7 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 			return 2;
 		}
 
-		pFrame->Dump(pMsgHead, pMsgBody, "recv ");
+		pFrame->Dump(NULL, pMsgHead, pMsgBody, "recv ");
 
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pMsgBody);
 	}
@@ -91,7 +91,7 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 			return 2;
 		}
 
-		pFrame->Dump(pMsgHead, pMsgBody, "recv ");
+		pFrame->Dump(NULL, pMsgHead, pMsgBody, "recv ");
 
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pMsgBody, pBuf, nBufSize);
 	}
@@ -111,6 +111,8 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 		{
 			return 2;
 		}
+
+		pFrame->Dump(NULL, pMsgHead, NULL, "recv ");
 
 		nRet = (pInstance->*Proc)(pObj, pMsgHead, pBuf, nBufSize);
 	}
@@ -142,7 +144,7 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 			return 2;
 		}
 
-		pFrame->Dump(pMsgHead, pMsgBody, "recv ");
+		pFrame->Dump(pCtlHead, pMsgHead, pMsgBody, "recv ");
 
 		nRet = (pInstance->*Proc)(pCtlHead, pMsgHead, pMsgBody, pBuf, nBufSize);
 	}
@@ -167,6 +169,8 @@ int32_t FrameMsgCallBack(CFrame *pFrame, CMsgMapDecl &stMsgMap, int32_t nMsgID, 
 		{
 			return 2;
 		}
+
+		pFrame->Dump(pCtlHead, pMsgHead, NULL, "recv ");
 
 		nRet = (pInstance->*Proc)(pCtlHead, pMsgHead, pBuf, nBufSize);
 	}
