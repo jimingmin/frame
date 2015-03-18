@@ -29,6 +29,8 @@ public:
 	//---------------------------hash----------------------------------------
 	int32_t HMSet(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
 
+	int32_t HMSet(RedisSession *pSession, char *szTarget, int32_t nArgc, const char **Argv, const size_t *ArgvLen);
+
 	int32_t HMGet(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
 
 	int32_t HIncrBy(RedisSession *pSession, char *szTarget, const char *szFormat, ...);

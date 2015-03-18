@@ -68,6 +68,17 @@ int32_t CRedisChannel::HMSet(RedisSession *pSession, char *szTarget, const char 
 	return nStatus;
 }
 
+int32_t CRedisChannel::HMSet(RedisSession *pSession, char *szTarget, int32_t nArgc, const char **Argv, const size_t *ArgvLen)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("HMSET", (char *)strKey.c_str(), pSession, nArgc, Argv, ArgvLen);
+}
+
 int32_t CRedisChannel::HMGet(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
 {
 	string strKey = m_strChannelKey;
