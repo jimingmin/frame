@@ -8,6 +8,9 @@
 #include "server_helper.h"
 #include "../common/common_crypt.h"
 #include "../include/typedef.h"
+#include "frame.h"
+
+using namespace FRAME;
 
 static char g_arrSSKey[16] = {'v', 'd', 'c', '$', 'a', 'u', 't', 'h', '@', '1', '7','9','.', 'c', 'o', 'm'};
 
@@ -76,5 +79,6 @@ int32_t CServerHelper::SendMsgToClient(IIOSession *pIoSession, MsgHeadCS *pMsgHe
 	uint32_t nOffset = 0;
 	CCodeEngine::Encode(arrMsg, sizeof(arrMsg), nOffset, nTotalSize);
 
+	g_Frame.Dump(NULL, pMsgHeadCS, NULL, "send ");
 	return pIoSession->Write(arrMsg, nTotalSize);
 }
