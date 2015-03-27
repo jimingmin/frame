@@ -12,26 +12,20 @@
 #include "../common/common_memmgt.h"
 #include "../include/cachekey_define.h"
 
-CRedisChannel::CRedisChannel(int32_t nServerID, char *pAddress, uint16_t nPort, char *pChannelKey, char *pChannelMode)
+CRedisChannel::CRedisChannel(int32_t nServerID, char *pAddress, uint16_t nPort, char *pChannelKey)
 :CRedisRaw(nServerID, pAddress, nPort)
 {
 	m_strChannelKey = string(pChannelKey);
-	if(pChannelMode != NULL)
-	{
-		m_strChannelMode = string(pChannelMode);
-	}
-
-	m_pSubscribeSession = NULL;
 }
 
 int32_t CRedisChannel::OnConnected()
 {
-	if((m_strChannelMode == string("subscribe")) && m_pSubscribeSession != NULL)
-	{
-		Subscribe(m_pSubscribeSession);
-	}
-
 	return 0;
+}
+
+void CRedisChannel::OnClosed()
+{
+
 }
 
 //---------------------------string--------------------------------------
@@ -130,7 +124,7 @@ int32_t CRedisChannel::HExists(RedisSession *pSession, char *szTarget, const cha
 //---------------------------list-----------------------------------------
 int32_t CRedisChannel::RPush(RedisSession *pSession, char *pValue, uint16_t nValueLen)
 {
-	return SendCommand("RPush", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, nValueLen);
+	return SendCommand("RPush", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
 }
 
 int32_t CRedisChannel::LPop(RedisSession *pSession)
@@ -171,10 +165,5 @@ void CRedisChannel::OnUnsubscribeReply(const redisAsyncContext *pContext, void *
 int32_t CRedisChannel::Publish(RedisSession *pSession, char *pValue, int32_t nValueLen)
 {
 	return SendCommand("PUBLISH", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
-}
-
-void CRedisChannel::AttachSession(RedisSession *pSubscribeSession)
-{
-	m_pSubscribeSession = pSubscribeSession;
 }
 

@@ -17,9 +17,11 @@ using namespace FRAME;
 class CRedisChannel : public CRedisRaw
 {
 public:
-	CRedisChannel(int32_t nServerID, char *pAddress, uint16_t nPort, char *pChannelKey, char *pChannelMode);
+	CRedisChannel(int32_t nServerID, char *pAddress, uint16_t nPort, char *pChannelKey);
 
 	virtual int32_t OnConnected();
+
+	virtual void OnClosed();
 
 	//---------------------------string--------------------------------------
 	int32_t IncrBy(RedisSession *pSession, char *szTarget, int64_t nIncrement);
@@ -52,12 +54,8 @@ public:
 
 	int32_t Publish(RedisSession *pSession, char *pValue, int32_t nValueLen);
 
-	void AttachSession(RedisSession *pSubscribeSession);
-
 protected:
 	string				m_strChannelKey;
-	string				m_strChannelMode;
-	RedisSession		*m_pSubscribeSession;
 };
 
 
