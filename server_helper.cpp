@@ -28,7 +28,7 @@ void CServerHelper::FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize,
 int32_t CServerHelper::MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, uint8_t *pOutBuf, int32_t nOutBufSize)
 {
 //	ControlHead *pControlHead = (ControlHead *)pCtlHead;
-//	MsgHeadCS *pMsgHeadCS = (MsgHeadCS *)pMsgHead;
+	MsgHeadCS *pMsgHeadCS = (MsgHeadCS *)pMsgHead;
 
 	uint32_t nOffset = 0;
 	int32_t nRet = pCtlHead->Encode(pOutBuf, nOutBufSize, nOffset);
@@ -53,6 +53,7 @@ int32_t CServerHelper::MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody 
 
 	//msghead + msgbody的大小
 	uint16_t nMsgTotalSize = nOffset - nCtlHeadSize;
+	pMsgHeadCS->m_nTotalSize = nMsgTotalSize;
 	nOffset = nCtlHeadSize;
 	CCodeEngine::Encode(pOutBuf, nOutBufSize, nOffset, nMsgTotalSize);
 
