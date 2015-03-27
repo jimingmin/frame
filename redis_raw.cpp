@@ -137,7 +137,7 @@ void CRedisRaw::OnRedisReply(const redisAsyncContext *pContext, void *pReply, vo
 		return;
 	}
 
-    if (pReply == NULL)
+   if (pReply == NULL)
     {
     	return;
     }
@@ -265,15 +265,29 @@ int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSessio
 int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSession, int32_t nArgc, const char **Argv, const size_t *ArgvLen)
 {
 	int32_t nStatus;
+	char *arrArgv[nArgc + 2];
+	size_t arrArgvLen[nArgc + 2];
+
+	arrArgv[0] = (char *)szCommand;
+	arrArgv[1] = (char *)szKey;
+	arrArgvLen[0] = strlen(szCommand);
+	arrArgvLen[1] = strlen(szKey);
+
+	for(int32_t i = 0; i < nArgc; ++i)
+	{
+		arrArgv[i + 2] = (char *)Argv[i];
+		arrArgvLen[i + 2] = ArgvLen[i];
+	}
+
 	if(pSession == NULL)
 	{
-		nStatus = redisAsyncCommandArgv(m_pRedisContext, NULL, NULL, nArgc, Argv, ArgvLen);
+		nStatus = redisAsyncCommandArgv(m_pRedisContext, NULL, NULL, nArgc + 2, (const char **)arrArgv, arrArgvLen);
 	}
 	else
 	{
     	uint32_t *pSessionIndex = ((CSessionIndexBank *)g_Frame.GetBank(BANK_SESSION_INDEX))->CreateSessionIndex();
     	*pSessionIndex = ((RedisSession *)pSession)->GetSessionIndex();
-		nStatus = redisAsyncCommandArgv(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSessionIndex, nArgc, Argv, ArgvLen);
+		nStatus = redisAsyncCommandArgv(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSessionIndex, nArgc + 2, (const char **)arrArgv, arrArgvLen);
 	}
 
 	return nStatus;
