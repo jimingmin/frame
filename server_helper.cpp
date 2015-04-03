@@ -14,6 +14,164 @@ using namespace FRAME;
 
 static char g_arrSSKey[16] = {'v', 'd', 'c', '$', 'a', 'u', 't', 'h', '@', '1', '7','9','.', 'c', 'o', 'm'};
 
+bool CServerHelper::IsExist(Document &document, const char *szKey)
+{
+	return document.HasMember(szKey);
+}
+
+bool CServerHelper::IsExist(Value &value, const char *szKey)
+{
+	return value.HasMember(szKey);
+}
+
+bool CServerHelper::GetInt(Document &document, const char *szKey, int32_t &nValue)
+{
+	if(!document.HasMember(szKey))
+	{
+		return false;
+	}
+
+	nValue = 0;
+
+	if(!document[szKey].IsInt())
+	{
+		if(!document[szKey].IsString())
+		{
+			return false;
+		}
+		nValue = atoi(document[szKey].GetString());
+	}
+	else
+	{
+		nValue = document[szKey].GetInt();
+	}
+
+	return true;
+}
+
+bool CServerHelper::GetUint(Document &document, const char *szKey, uint32_t &nValue)
+{
+	if(!document.HasMember(szKey))
+	{
+		return false;
+	}
+
+	nValue = 0;
+
+	if(!document[szKey].IsUint())
+	{
+		if(!document[szKey].IsString())
+		{
+			return false;
+		}
+		nValue = atoi(document[szKey].GetString());
+	}
+	else
+	{
+		nValue = document[szKey].GetUint();
+	}
+
+	return true;
+}
+
+bool CServerHelper::GetString(Document &document, const char *szKey, string &nValue)
+{
+	if(!document.HasMember(szKey))
+	{
+		return false;
+	}
+
+	nValue = "";
+	if(!document[szKey].IsString())
+	{
+		return false;
+	}
+
+	nValue = document[szKey].GetString();
+	return true;
+}
+
+
+bool CServerHelper::GetInt(Value &value, const char *szKey, int32_t &nValue)
+{
+	if(!value.HasMember(szKey))
+	{
+		return false;
+	}
+
+	nValue = 0;
+
+	if(!value[szKey].IsInt())
+	{
+		if(!value[szKey].IsString())
+		{
+			return false;
+		}
+		nValue = atoi(value[szKey].GetString());
+	}
+	else
+	{
+		nValue = value[szKey].GetInt();
+	}
+
+	return true;
+}
+
+bool CServerHelper::GetString(Value &value, const char *szKey, string &nValue)
+{
+	if(!value.HasMember(szKey))
+	{
+		return false;
+	}
+
+	nValue = "";
+	if(!value[szKey].IsString())
+	{
+		return false;
+	}
+
+	nValue = value[szKey].GetString();
+	return true;
+}
+
+bool CServerHelper::GetValue(Document &document, const char *szKey, Value &nValue)
+{
+	if(!document.HasMember(szKey))
+	{
+		return false;
+	}
+
+	nValue = "";
+
+	if(!document[szKey].IsObject())
+	{
+		return false;
+	}
+
+	nValue = document[szKey];
+
+	return true;
+}
+
+bool CServerHelper::GetValue(Value &value, const char *szKey, Value &nValue)
+{
+	if(!value.HasMember(szKey))
+	{
+		return false;
+	}
+
+	nValue = "";
+
+	if(!value[szKey].IsObject())
+	{
+		return false;
+	}
+
+	nValue = value[szKey];
+
+	return true;
+}
+
 void CServerHelper::FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize, ControlCode nCtlCode, uint32_t nUin, SessionID nSessionID,
 			uint32_t nClientAddress, uint16_t nClientPort)
 {
