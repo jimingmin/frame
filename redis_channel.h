@@ -23,10 +23,31 @@ public:
 
 	virtual void OnClosed();
 
+	//---------------------------transaction--------------------------------
+	void Multi(char *szTarget);
+
+	void Exec(char *szTarget);
+
+	//---------------------------key-----------------------------------------
+	int32_t Del(RedisSession *pSession, char *szKey);
+
+	int32_t Del(RedisSession *pSession, const char *szFormat, ...);
+
 	//---------------------------string--------------------------------------
+
+	int32_t Get(RedisSession *pSession, char *szKey);
+
 	int32_t IncrBy(RedisSession *pSession, char *szTarget, int64_t nIncrement);
 
 	int32_t Incr(RedisSession *pSession, char *szTarget);
+
+	int32_t SetNX(RedisSession *pSession, char *szKey, char *szValue);
+
+	int32_t SetNX(RedisSession *pSession, char *szKey, int64_t nValue);
+
+	int32_t GetSet(RedisSession *pSession, char *szKey, char *szValue);
+
+	int32_t GetSet(RedisSession *pSession, char *szKey, int64_t nValue);
 
 	//---------------------------hash----------------------------------------
 	int32_t HMSet(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
@@ -40,10 +61,24 @@ public:
 	int32_t HExists(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
 
 	//---------------------------list-----------------------------------------
+	int32_t BLPop(RedisSession *pSession, int32_t nTimeout);
 
 	int32_t RPush(RedisSession *pSession, char *pValue, uint16_t nValueLen);
 
 	int32_t LPop(RedisSession *pSession = NULL);
+
+	//---------------------------set-----------------------------------------
+	int32_t SAdd(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
+
+	int32_t SRem(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
+
+	//---------------------------sortedset-------------------------------------
+	int32_t ZAdd(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
+
+	int32_t ZRem(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
+
+	int32_t ZRangeByScore(RedisSession *pSession, char *szTarget, int32_t nMinIndex = -1, int32_t nMaxIndex = -1,
+			bool bWithScores = false, int32_t nOffset = 0, int32_t nCount = 1);
 
 	//----------------------------sub/pub--------------------------------------
 	int32_t Subscribe(RedisSession *pSession);
