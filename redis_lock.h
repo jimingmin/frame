@@ -81,7 +81,7 @@ public:
 
 	int32_t Lock(char *szKey);
 
-	int32_t Unlock(char *szKey);
+	int32_t Unlock();
 
 	int32_t OnSessionSetNX(int32_t nResult, void *pReply, void *pSession);
 
@@ -89,7 +89,7 @@ public:
 
 	int32_t OnSessionGetSet(int32_t nResult, void *pReply, void *pSession);
 
-	int32_t OnRedisSessionTimeout(void *pTimerData);
+//	int32_t OnRedisSessionTimeout(void *pTimerData);
 
 protected:
 	string				m_strLockName;

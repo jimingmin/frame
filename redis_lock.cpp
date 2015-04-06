@@ -67,7 +67,7 @@ int32_t RedisLock::Lock(char *szKey)
 	return m_pRedisChannel->SetNX(pRedisSession, szKey, CDateTime::CurrentDateTime().Seconds());
 }
 
-int32_t RedisLock::Unlock(char *szKey)
+int32_t RedisLock::Unlock()
 {
 	int64_t nCurMilliTime = CTimeValue::CurrentTime().Seconds();
 	if(nCurMilliTime > m_nLockExpireTime)
@@ -95,6 +95,10 @@ int32_t RedisLock::OnSessionSetNX(int32_t nResult, void *pReply, void *pSession)
 			pRedisSession->SetHandleRedisReply(static_cast<RedisReply>(&RedisLock::OnSessionGet));
 			return m_pRedisChannel->Get(pRedisSession, (char *)m_strLockName.c_str());
 		}
+	}
+	else if(pRedisReply->type == REDIS_REPLY_NIL)
+	{
+		Lock((char *)m_strLockName.c_str());
 	}
 	else
 	{
@@ -162,12 +166,12 @@ int32_t RedisLock::OnSessionGetSet(int32_t nResult, void *pReply, void *pSession
 
 	return 0;
 }
-int32_t RedisLock::OnRedisSessionTimeout(void *pTimerData)
-{
-	RedisSession *pRedisSession = (RedisSession *)pTimerData;
-
-	(m_pHandlerObj->*m_fcLockResult)(enmRedisLock_Timeout, this);
-
-	return 0;
-}
+//int32_t RedisLock::OnRedisSessionTimeout(void *pTimerData)
+//{
+//	RedisSession *pRedisSession = (RedisSession *)pTimerData;
+//
+//	(m_pHandlerObj->*m_fcLockResult)(enmRedisLock_Timeout, this);
+//
+//	return 0;
+//}
 
