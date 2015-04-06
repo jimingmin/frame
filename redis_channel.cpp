@@ -31,26 +31,16 @@ void CRedisChannel::OnClosed()
 }
 
 //---------------------------transaction--------------------------------
-void CRedisChannel::Multi(char *szTarget)
+void CRedisChannel::Multi()
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	SendCommand("MULTI", (char *)strKey.c_str(), NULL);
+	char *pCmd = "*1\r\n$5\r\n$MULTI\r\n";
+	SendFormatedCommand(NULL, pCmd, strlen(pCmd));
 }
 
-void CRedisChannel::Exec(char *szTarget)
+void CRedisChannel::Exec()
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	SendCommand("EXEC", (char *)strKey.c_str(), NULL);
+	char *pCmd = "*1\r\n$4\r\n$EXEC\r\n";
+	SendFormatedCommand(NULL, pCmd, strlen(pCmd));
 }
 
 //---------------------------key-----------------------------------------
@@ -253,6 +243,20 @@ int32_t CRedisChannel::ZAdd(RedisSession *pSession, char *szTarget, const char *
 	return nStatus;
 }
 
+int32_t CRedisChannel::ZCount(RedisSession *pSession, char *szTarget, int32_t nMinIndex, int32_t nMaxIndex)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	string strMinIndex = (nMinIndex == -1 ? "-inf" : itoa(nMinIndex));
+	string strMaxIndex = (nMaxIndex == -1 ? "+inf" : itoa(nMaxIndex));
+
+	return SendCommand("ZCOUNT", (char *)strKey.c_str(), pSession, "%s %s", strMinIndex.c_str(), strMaxIndex.c_str());
+}
+
 int32_t CRedisChannel::ZRem(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
 {
 	string strKey = m_strChannelKey;
@@ -295,6 +299,17 @@ int32_t CRedisChannel::ZRangeByScore(RedisSession *pSession, char *szTarget, int
 	return nStatus;
 }
 
+
+int32_t CRedisChannel::ZRemRangeByRank(RedisSession *pSession, char *szTarget, int32_t nStartIndex, int32_t nStopIndex)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("ZREMRANGEBYRANK", (char *)strKey.c_str(), pSession, "%d %d", nStartIndex, nStopIndex);
+}
 
 //----------------------------sub/pub--------------------------------------
 int32_t CRedisChannel::Subscribe(RedisSession *pSession)

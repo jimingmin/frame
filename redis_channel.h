@@ -24,9 +24,9 @@ public:
 	virtual void OnClosed();
 
 	//---------------------------transaction--------------------------------
-	void Multi(char *szTarget);
+	void Multi();
 
-	void Exec(char *szTarget);
+	void Exec();
 
 	//---------------------------key-----------------------------------------
 	int32_t Del(RedisSession *pSession, char *szKey);
@@ -75,10 +75,14 @@ public:
 	//---------------------------sortedset-------------------------------------
 	int32_t ZAdd(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
 
+	int32_t ZCount(RedisSession *pSession, char *szTarget, int32_t nMinIndex = -1, int32_t nMaxIndex = -1);
+
 	int32_t ZRem(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
 
 	int32_t ZRangeByScore(RedisSession *pSession, char *szTarget, int32_t nMinIndex = -1, int32_t nMaxIndex = -1,
 			bool bWithScores = false, int32_t nOffset = 0, int32_t nCount = 1);
+
+	int32_t ZRemRangeByRank(RedisSession *pSession, char *szTarget, int32_t nStartIndex = 0, int32_t nStopIndex = -1);
 
 	//----------------------------sub/pub--------------------------------------
 	int32_t Subscribe(RedisSession *pSession);
