@@ -57,7 +57,7 @@ RedisLock *CRedisLockBank::CreateLock(CRedisChannel *pRedisChannel, CBaseObject 
 
 	CRedisSessionBank *pRedisSessionBank = (CRedisSessionBank *)g_Frame.GetBank(BANK_REDIS_SESSION);
 	RedisSession *pSession = pRedisSessionBank->CreateSession(pRedisLock, static_cast<RedisReply>(&RedisLock::OnSessionSetNX),
-			static_cast<TimerProc>(&RedisLock::OnRedisSessionTimeout));
+			static_cast<TimerProc>(&CRedisLockBank::OnLockTimeout));
 
 	pRedisLock->SetRedisChannel(pRedisChannel);
 	pRedisLock->SetHandlerObj(pHandlerObj);
@@ -83,11 +83,9 @@ RedisLock *CRedisLockBank::GetLock(uint32_t nSessionIndex)
 
 void CRedisLockBank::DestroyLock(RedisLock *pRedisLock)
 {
-	DestroyLock(pRedisLock->GetSessionIndex());
-}
+	pRedisLock->Unlock();
 
-void CRedisLockBank::DestroyLock(uint32_t nSessionIndex)
-{
+	uint32_t nSessionIndex = pRedisLock->GetSessionIndex();
 	map<uint32_t, RedisLock *>::iterator it = m_stUsedLockMap.find(nSessionIndex);
 	if(it != m_stUsedLockMap.end())
 	{
@@ -99,9 +97,25 @@ void CRedisLockBank::DestroyLock(uint32_t nSessionIndex)
 	pRedisSessionBank->DestroySession(nSessionIndex);
 }
 
-int32_t CRedisLockBank::OnLockTimeout(CTimer *pTimer)
+void CRedisLockBank::DestroyLock(uint32_t nSessionIndex)
 {
-	RedisSession *pRedisSession = (RedisSession *)pTimer->GetTimerData();
+	RedisLock *pRedisLock = GetLock(nSessionIndex);
+	pRedisLock->Unlock();
+
+	map<uint32_t, RedisLock *>::iterator it = m_stUsedLockMap.find(nSessionIndex);
+	if(it != m_stUsedLockMap.end())
+	{
+		m_stUnusedLockList.push_front(it->second);
+		m_stUsedLockMap.erase(it);
+	}
+
+	CRedisSessionBank *pRedisSessionBank = (CRedisSessionBank *)g_Frame.GetBank(BANK_REDIS_SESSION);
+	pRedisSessionBank->DestroySession(nSessionIndex);
+}
+
+int32_t CRedisLockBank::OnLockTimeout(void *pTimerData)
+{
+	RedisSession *pRedisSession = (RedisSession *)pTimerData;
 	RedisLock *pRedisLock = GetLock(pRedisSession->GetSessionIndex());
 	CBaseObject *pHandler = pRedisLock->GetHandlerObj();
 	LockResult Proc = pRedisLock->GetLockResultCallback();

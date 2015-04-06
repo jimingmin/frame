@@ -36,7 +36,7 @@ public:
 
 	void DestroyLock(uint32_t nSessionIndex);
 
-	int32_t OnLockTimeout(CTimer *pTimer);
+	int32_t OnLockTimeout(void *pTimerData);
 
 protected:
 	uint32_t						m_nLockCounter;
