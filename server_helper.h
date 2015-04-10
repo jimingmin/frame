@@ -39,7 +39,7 @@ public:
 	static bool GetValue(Value &value, const char *szKey, Value &nValue);
 
 	static void FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize, ControlCode nCtlCode, uint32_t nUin, SessionID nSessionID,
-			uint32_t nClientAddress, uint16_t nClientPort);
+			uint32_t nClientAddress, uint16_t nClientPort, int32_t nGateID);
 
 	static int32_t MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, uint8_t *pOutBuf, int32_t nOutBufSize);
 

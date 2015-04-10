@@ -7,6 +7,7 @@
 
 #include "server_helper.h"
 #include "../common/common_crypt.h"
+#include "../common/common_datetime.h"
 #include "../include/typedef.h"
 #include "frame.h"
 
@@ -173,7 +174,7 @@ bool CServerHelper::GetValue(Value &value, const char *szKey, Value &nValue)
 }
 
 void CServerHelper::FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize, ControlCode nCtlCode, uint32_t nUin, SessionID nSessionID,
-			uint32_t nClientAddress, uint16_t nClientPort)
+			uint32_t nClientAddress, uint16_t nClientPort, int32_t nGateID)
 {
 	stCtlHead.m_nTotalSize = nTotalSize;
 	stCtlHead.m_nControlCode = nCtlCode;
@@ -181,6 +182,8 @@ void CServerHelper::FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize,
 	stCtlHead.m_nSessionID = nSessionID;
 	stCtlHead.m_nClientAddress = nClientAddress;
 	stCtlHead.m_nClientPort = nClientPort;
+	stCtlHead.m_nGateID = nGateID;
+	stCtlHead.m_nTimeStamp = CTimeValue::CurrentTime().Milliseconds();
 }
 
 int32_t CServerHelper::MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, uint8_t *pOutBuf, int32_t nOutBufSize)
