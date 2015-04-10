@@ -26,7 +26,7 @@ public:
 	//---------------------------transaction--------------------------------
 	void Multi();
 
-	void Exec();
+	void Exec(RedisSession *pSession);
 
 	//---------------------------key-----------------------------------------
 	int32_t Del(RedisSession *pSession, char *szKey);
@@ -50,6 +50,8 @@ public:
 	int32_t GetSet(RedisSession *pSession, char *szKey, int64_t nValue);
 
 	//---------------------------hash----------------------------------------
+	int32_t HDel(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
+
 	int32_t HMSet(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
 
 	int32_t HMSet(RedisSession *pSession, char *szTarget, int32_t nArgc, const char **Argv, const size_t *ArgvLen);
@@ -80,7 +82,7 @@ public:
 	int32_t ZRem(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
 
 	int32_t ZRangeByScore(RedisSession *pSession, char *szTarget, int32_t nMinIndex = -1, int32_t nMaxIndex = -1,
-			bool bWithScores = false, int32_t nOffset = 0, int32_t nCount = 1);
+			bool bWithScores = false, int32_t nOffset = 0, int32_t nCount = -1);
 
 	int32_t ZRemRangeByRank(RedisSession *pSession, char *szTarget, int32_t nStartIndex = 0, int32_t nStopIndex = -1);
 

@@ -33,20 +33,26 @@ void CRedisChannel::OnClosed()
 //---------------------------transaction--------------------------------
 void CRedisChannel::Multi()
 {
-	char *pCmd = "*1\r\n$5\r\n$MULTI\r\n";
+	char *pCmd = "*1\r\n$5\r\nMULTI\r\n";
 	SendFormatedCommand(NULL, pCmd, strlen(pCmd));
 }
 
-void CRedisChannel::Exec()
+void CRedisChannel::Exec(RedisSession *pSession)
 {
-	char *pCmd = "*1\r\n$4\r\n$EXEC\r\n";
-	SendFormatedCommand(NULL, pCmd, strlen(pCmd));
+	char *pCmd = "*1\r\n$4\r\nEXEC\r\n";
+	SendFormatedCommand(pSession, pCmd, strlen(pCmd));
 }
 
 //---------------------------key-----------------------------------------
-int32_t CRedisChannel::Del(RedisSession *pSession, char *szKey)
+int32_t CRedisChannel::Del(RedisSession *pSession, char *szTarget)
 {
-	return SendCommand("DEL", (char *)m_strChannelKey.c_str(), NULL);
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("DEL", (char *)strKey.c_str(), NULL);
 }
 
 int32_t CRedisChannel::Del(RedisSession *pSession, const char *szFormat, ...)
@@ -102,6 +108,22 @@ int32_t CRedisChannel::GetSet(RedisSession *pSession, char *szKey, int64_t nValu
 }
 
 //---------------------------hash----------------------------------------
+int32_t CRedisChannel::HDel(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	va_list ap;
+	va_start(ap, szFormat);
+	int32_t nStatus = SendCommand("HDEL", (char *)strKey.c_str(), pSession, szFormat, ap);
+	va_end(ap);
+
+	return nStatus;
+}
+
 int32_t CRedisChannel::HMSet(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
 {
 	string strKey = m_strChannelKey;
@@ -287,13 +309,29 @@ int32_t CRedisChannel::ZRangeByScore(RedisSession *pSession, char *szTarget, int
 	int32_t nStatus;
 	if(bWithScores)
 	{
-		nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %s %d %d", strMinIndex.c_str(),
-				strMaxIndex.c_str(), "WITHSCORES", (size_t)nOffset, (size_t)nCount);
+		if(nCount < 0)
+		{
+			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %s", strMinIndex.c_str(),
+					strMaxIndex.c_str(), "WITHSCORES");
+		}
+		else
+		{
+			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %s %s %d %d", strMinIndex.c_str(),
+					strMaxIndex.c_str(), "WITHSCORES", "LIMIT", (size_t)nOffset, (size_t)nCount);
+		}
 	}
 	else
 	{
-		nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %d %d", strMinIndex.c_str(),
-				strMaxIndex.c_str(), (size_t)nOffset, (size_t)nCount);
+		if(nCount < 0)
+		{
+			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s", strMinIndex.c_str(),
+					strMaxIndex.c_str());
+		}
+		else
+		{
+			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %s %d %d", strMinIndex.c_str(),
+					strMaxIndex.c_str(), "LIMIT", (size_t)nOffset, (size_t)nCount);
+		}
 	}
 
 	return nStatus;
