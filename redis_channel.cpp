@@ -87,6 +87,106 @@ int32_t CRedisChannel::Incr(RedisSession *pSession, char *szTarget)
 	return IncrBy(pSession, szTarget, 1);
 }
 
+int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s", szValue);
+}
+
+int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, int64_t nValue)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%ld", nValue);
+}
+
+int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue, enum TimeUnit nUnit, int64_t nTime)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	char szTimeUnit[8];
+	if(nUnit == enmTimeUnit_Second)
+	{
+		strcpy(szTimeUnit, "EX");
+		szTimeUnit[2] = '\0';
+	}
+	else
+	{
+		strcpy(szTimeUnit, "PX");
+		szTimeUnit[2] = '\0';
+	}
+	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s %s %ld", szValue, szTimeUnit, nTime);
+}
+
+int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue, enum TimeUnit nUnit, int64_t nTime, enum SetType nType)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	char szTimeUnit[4];
+	if(nUnit == enmTimeUnit_Second)
+	{
+		strcpy(szTimeUnit, "EX");
+		szTimeUnit[2] = '\0';
+	}
+	else
+	{
+		strcpy(szTimeUnit, "PX");
+		szTimeUnit[2] = '\0';
+	}
+
+	char szSetType[4];
+	if(nType == enmSetType_XX)
+	{
+		strcpy(szSetType, "XX");
+		szSetType[2] = '\0';
+	}
+	else
+	{
+		strcpy(szSetType, "NX");
+		szSetType[2] = '\0';
+	}
+	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s %s %ld %s", szValue, szTimeUnit, nTime, szSetType);
+}
+
+int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue, enum SetType nType)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	char szSetType[4];
+	if(nType == enmSetType_XX)
+	{
+		strcpy(szSetType, "XX");
+		szSetType[2] = '\0';
+	}
+	else
+	{
+		strcpy(szSetType, "NX");
+		szSetType[2] = '\0';
+	}
+	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s %s", szValue, szSetType);
+}
+
 int32_t CRedisChannel::SetNX(RedisSession *pSession, char *szKey, char *szValue)
 {
 	return SendCommand("SETNX", szKey, pSession, "%s", szValue);

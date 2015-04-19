@@ -17,6 +17,18 @@ using namespace FRAME;
 class CRedisChannel : public CRedisRaw
 {
 public:
+	enum TimeUnit
+	{
+		enmTimeUnit_Second,
+		enmTimeUnit_MilliSecond,
+	};
+
+	enum SetType
+	{
+		enmSetType_NX,		//只在键不存在时，才对键进行设置操作
+		enmSetType_XX,		//只在键已经存在时，才对键进行设置操作
+	};
+
 	CRedisChannel(int32_t nServerID, char *pAddress, uint16_t nPort, char *pChannelKey);
 
 	virtual int32_t OnConnected();
@@ -40,6 +52,17 @@ public:
 	int32_t IncrBy(RedisSession *pSession, char *szTarget, int64_t nIncrement);
 
 	int32_t Incr(RedisSession *pSession, char *szTarget);
+
+	//SET key value [EX seconds] [PX milliseconds] [NX|XX]
+	int32_t Set(RedisSession *pSession, char *szTarget, char *szValue);
+
+	int32_t Set(RedisSession *pSession, char *szTarget, int64_t nValue);
+
+	int32_t Set(RedisSession *pSession, char *szTarget, char *szValue, enum TimeUnit nUnit, int64_t nTime);
+
+	int32_t Set(RedisSession *pSession, char *szTarget, char *szValue, enum TimeUnit nUnit, int64_t nTime, enum SetType nType);
+
+	int32_t Set(RedisSession *pSession, char *szTarget, char *szValue, enum SetType nType);
 
 	int32_t SetNX(RedisSession *pSession, char *szKey, char *szValue);
 
