@@ -310,9 +310,36 @@ int32_t CRedisChannel::RPush(RedisSession *pSession, char *pValue, uint16_t nVal
 	return SendCommand("RPUSH", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
 }
 
+int32_t CRedisChannel::RPush(RedisSession *pSession, char *szTarget, char *pValue, uint16_t nValueLen)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("RPUSH", (char *)strKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
+}
+
 int32_t CRedisChannel::LPop(RedisSession *pSession)
 {
 	return SendCommand("LPOP", (char *)m_strChannelKey.c_str(), pSession);
+}
+
+int32_t CRedisChannel::LPush(RedisSession *pSession, char *pValue, uint16_t nValueLen)
+{
+	return SendCommand("LPUSH", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
+}
+
+int32_t CRedisChannel::LPush(RedisSession *pSession, char *szTarget, char *pValue, uint16_t nValueLen)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("LPUSH", (char *)strKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
 }
 
 //---------------------------set-----------------------------------------

@@ -90,7 +90,13 @@ public:
 
 	int32_t RPush(RedisSession *pSession, char *pValue, uint16_t nValueLen);
 
+	int32_t RPush(RedisSession *pSession, char *szTarget, char *pValue, uint16_t nValueLen);
+
 	int32_t LPop(RedisSession *pSession = NULL);
+
+	int32_t LPush(RedisSession *pSession, char *pValue, uint16_t nValueLen);
+
+	int32_t LPush(RedisSession *pSession, char *szTarget, char *pValue, uint16_t nValueLen);
 
 	//---------------------------set-----------------------------------------
 	int32_t SAdd(RedisSession *pSession, char *szTarget, const char *szFormat, ...);
