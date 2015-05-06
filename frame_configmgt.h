@@ -34,8 +34,11 @@ public:
 
 	IConfig *GetConfig(const char *szConfigName);
 
+	IConfig *GetSafeConfig(const char *szConfigName);
+
 protected:
 	ConfigMgt		m_stConfigMgt;
+	ConfigMgt		m_stSafeConfigMgt;
 };
 
 FRAME_NAMESPACE_END

@@ -11,6 +11,7 @@
 #include "../common/common_singleton.h"
 #include "../common/common_typedef.h"
 #include "../common/common_export.h"
+#include "../common/common_mutex.h"
 #include "../netevent/net_impl.h"
 #include "frame_impl.h"
 #include "frame_namespace.h"
@@ -21,6 +22,7 @@
 #include "frame_timertask.h"
 #include "frame_bankmgt.h"
 #include "frame_macrodefine.h"
+#include "frame_safeconfig.h"
 
 #include <signal.h>
 #include <list>
@@ -39,9 +41,13 @@ public:
 
 	EXPORT int32_t Uninit();
 
-	EXPORT int32_t Run();
+	EXPORT int32_t Run(bool bStop = false);
 
 	EXPORT void AddRunner(IRunnable *pRunner);
+
+	EXPORT void DelRunner(IRunnable *pRunner);
+
+	EXPORT void ClearRunner();
 
 	EXPORT int32_t CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
 
@@ -53,9 +59,15 @@ public:
 
 	EXPORT IConfig *GetConfig(const char *szConfigName);
 
+	EXPORT IConfig *GetSafeConfig(const char *szConfigName);
+
 	EXPORT void RegistBank(const char *szBankName, IBank *pBank);
 
 	EXPORT IBank *GetBank(const char *szBankName);
+
+	EXPORT int32_t StartCmdThread(const char *szServerName, int32_t nServiceType, uint16_t nServiceID, char *szHost, uint16_t nPort);
+
+	EXPORT int32_t StartLogicThread(const char *szServerName);
 	/*
 	 * 返回值:	1:not found msg handler
 	 * 			2:decode msg failed
@@ -78,6 +90,7 @@ protected:
 	list<IRunnable *>		m_stRunnerList;
 	CMsgMapDecl				m_stMsgMap;
 	CFrameTimerTask			*m_pTimerTask;
+	CriticalSection			m_stLoadConfigLock;
 	CFrameConfigMgt			*m_pConfigMgt;
 	CTimerMgt				*m_pTimerMgt;
 	CFrameBankMgt			*m_pBankMgt;
@@ -87,6 +100,7 @@ protected:
 
 REGIST_CLASS(Config, const char *, IConfig *)
 #define REGIST_CONFIG(config_name, config_class)	static regist_Config reg_##config_class(config_name, new config_class(config_name));
+#define REGIST_CONFIG_SAFE(config_name, config_class)	static regist_Config reg_##config_class(config_name, new CFrameSafeConfig<config_class>(config_name));
 
 REGIST_CLASS(Bank, const char *, IBank *)
 #define REGIST_BANK(bank_name, bank_class)		static regist_Bank reg_##bank_class(bank_name, new bank_class());

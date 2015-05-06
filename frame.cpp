@@ -10,6 +10,8 @@
 #include "../logger/logger_writer.h"
 #include "../logger/logger.h"
 #include "../common/common_codeengine.h"
+#include "cmd_thread.h"
+#include "logic_thread.h"
 
 #include <stdarg.h>
 #include <stddef.h>
@@ -19,6 +21,7 @@
 #include <sys/stat.h>
 #endif
 using namespace LOGGER;
+using namespace NETEVENT;
 
 FRAME_NAMESPACE_BEGIN
 
@@ -90,12 +93,15 @@ int32_t CFrame::Uninit()
 {
 	//配置卸载
 	m_pConfigMgt->Uninit();
+	//
+	m_pBankMgt->Uninit();
 	//定时器卸载
 	m_pTimerMgt->Uninit();
 
-	delete m_pTimerTask;
 	delete m_pConfigMgt;
 	delete m_pTimerMgt;
+	delete m_pBankMgt;
+	delete m_pTimerTask;
 	return 0;
 }
 
@@ -104,9 +110,19 @@ void CFrame::AddRunner(IRunnable *pRunner)
 	m_stRunnerList.push_back(pRunner);
 }
 
-int32_t CFrame::Run()
+void CFrame::DelRunner(IRunnable *pRunner)
 {
-	while(true)
+	m_stRunnerList.remove(pRunner);
+}
+
+void CFrame::ClearRunner()
+{
+	m_stRunnerList.clear();
+}
+
+int32_t CFrame::Run(bool bStop/* = false*/)
+{
+	while(bStop)
 	{
 		list<IRunnable *>::iterator it = m_stRunnerList.begin();
 		for(; it != m_stRunnerList.end(); ++it)
@@ -145,6 +161,11 @@ IConfig *CFrame::GetConfig(const char *szConfigName)
 	return m_pConfigMgt->GetConfig(szConfigName);
 }
 
+IConfig *CFrame::GetSafeConfig(const char *szConfigName)
+{
+	return m_pConfigMgt->GetSafeConfig(szConfigName);
+}
+
 void CFrame::RegistBank(const char *szBankName, IBank *pBank)
 {
 	m_pBankMgt->RegistBank(szBankName, pBank);
@@ -153,6 +174,20 @@ void CFrame::RegistBank(const char *szBankName, IBank *pBank)
 IBank *CFrame::GetBank(const char *szBankName)
 {
 	return m_pBankMgt->GetBank(szBankName);
+}
+
+int32_t CFrame::StartCmdThread(const char *szServerName, int32_t nServiceType, uint16_t nServiceID, char *szHost, uint16_t nPort)
+{
+	CCmdThread *pCmdThread = new CCmdThread(&m_stLoadConfigLock, szServerName, nServiceType, nServiceID, szHost, nPort);
+	return pCmdThread->Start();
+}
+
+int32_t CFrame::StartLogicThread(const char *szServerName)
+{
+	CLogicThread *pLogicThread = new CLogicThread(&m_stLoadConfigLock, szServerName, NULL);
+	pLogicThread->Start();
+
+	return 0;
 }
 
 int32_t CFrame::FrameCallBack(int32_t nMsgID, ...)

@@ -8,6 +8,7 @@
 #include "../logger/logger.h"
 #include "frame_define.h"
 #include "frame_configmgt.h"
+#include "frame_safeconfig.h"
 
 using namespace LOGGER;
 
@@ -46,14 +47,43 @@ void CFrameConfigMgt::RegistConfig(const char *szConfigName, IConfig *pConfig)
 		return;
 	}
 
-	m_stConfigMgt[szConfigName] = pConfig;
+	if(pConfig->IsSafe())
+	{
+		m_stSafeConfigMgt[szConfigName] = pConfig;
+	}
+	else
+	{
+		m_stConfigMgt[szConfigName] = pConfig;
+	}
 }
 
 IConfig *CFrameConfigMgt::GetConfig(const char *szConfigName)
 {
-
 	ConfigMgt::iterator it = m_stConfigMgt.find(szConfigName);
 	if(it != m_stConfigMgt.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		it = m_stSafeConfigMgt.find(szConfigName);
+		if(it != m_stSafeConfigMgt.end())
+		{
+			CFrameSafeConfig<IConfig> *pConfig = (CFrameSafeConfig<IConfig> *)(it->second);
+			if(pConfig != NULL)
+			{
+				return pConfig->GetConfig();
+			}
+		}
+	}
+
+	return NULL;
+}
+
+IConfig *CFrameConfigMgt::GetSafeConfig(const char *szConfigName)
+{
+	ConfigMgt::iterator it = m_stSafeConfigMgt.find(szConfigName);
+	if(it != m_stSafeConfigMgt.end())
 	{
 		return it->second;
 	}

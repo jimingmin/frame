@@ -30,6 +30,16 @@ public:
 	{
 		return 0;
 	}
+
+	virtual bool IsSafe()
+	{
+		return false;
+	}
+
+	virtual int32_t Parser(char *pXMLString)
+	{
+		return 0;
+	}
 };
 
 class EXPORT IBank : public CBaseObject
