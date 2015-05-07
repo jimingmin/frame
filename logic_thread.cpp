@@ -10,12 +10,13 @@
 
 using namespace FRAME;
 
-CLogicThread::CLogicThread(CriticalSection *pSection, const char *szServerName, InitProc Proc)
+CLogicThread::CLogicThread(CriticalSection *pSection, const char *szServerName, IInitFrame *pIniter)
 {
 	m_pSection = pSection;
 	memset(m_szServerName, 0, sizeof(m_szServerName));
 	strcpy(m_szServerName, szServerName);
-	m_pInitProc = Proc;
+
+	m_pIniter = pIniter;
 
 	//创建网络事件处理器
 	m_pNetHandler = new CNetHandler();
@@ -28,25 +29,25 @@ CLogicThread::~CLogicThread()
 		delete m_pNetHandler;
 		m_pNetHandler = NULL;
 	}
-
-	m_pInitProc = NULL;
 }
 
 //启动线程
-int32_t	CLogicThread::Start()
+int32_t CLogicThread::Start()
 {
-	while(true)
-	{
-		if(m_pSection->try_enter())
-		{
-			m_pSection->enter();
-			break;
-		}
-		else
-		{
-			Delay(100);
-		}
-	}
+//	while(true)
+//	{
+//		if(m_pSection->try_enter())
+//		{
+//			m_pSection->enter();
+//			break;
+//		}
+//		else
+//		{
+//			Delay(100);
+//		}
+//	}
+
+	m_pSection->enter();
 
 	m_pNetHandler->CreateReactor();
 	g_Frame.AddRunner(m_pNetHandler);
@@ -56,9 +57,12 @@ int32_t	CLogicThread::Start()
 		return 1;
 	}
 
-	if(m_pInitProc != NULL)
+	if(m_pIniter != NULL)
 	{
-		return (*m_pInitProc)(m_pNetHandler);
+		if(m_pIniter->InitFrame(m_pNetHandler) != 0)
+		{
+			return 1;
+		}
 	}
 
 	return CThread::Start();
@@ -79,7 +83,7 @@ int32_t	CLogicThread::Terminate()
 
 void CLogicThread::Execute()
 {
-	g_Frame.Run(!GetTerminated());
+	g_Frame.Run(GetTerminated());
 	g_Frame.Uninit();
 }
 

@@ -10,19 +10,19 @@
 
 #include "../common/common_thread.h"
 #include "../netevent/net_handler.h"
+#include "frame_impl.h"
 
 using namespace NETEVENT;
-
-typedef int32_t (*InitProc)(CNetHandler *pNetHandler);
+using namespace FRAME;
 
 class CLogicThread : public CThread
 {
 public:
-	CLogicThread(CriticalSection *pSection, const char *szServerName, InitProc Proc);
+	CLogicThread(CriticalSection *pSection, const char *szServerName, IInitFrame *pIniter);
 
 	virtual ~CLogicThread();
 	//启动线程
-	virtual int32_t	Start();
+	virtual int32_t Start();
 	//结束线程
 	virtual int32_t	Terminate();
 	//线程入口函数
@@ -31,8 +31,8 @@ public:
 protected:
 	CriticalSection *m_pSection;
 	char 			m_szServerName[1024];
-	InitProc 		m_pInitProc;
 	CNetHandler		*m_pNetHandler;
+	IInitFrame		*m_pIniter;
 };
 
 #endif /* LOGIC_THREAD_H_ */
