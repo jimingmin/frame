@@ -71,7 +71,15 @@ int32_t CCmdHandler::OnRecved(IIOSession *pIoSession, uint8_t *pBuf, uint32_t nB
 	{
 		if(LoadConfig(stParams["config"].GetString(), stParams["content"].GetString()))
 		{
+			LoadConfigError stLoadConfigError(m_szServiceName, m_nServiceType, m_nServiceID, (char *)stParams["config"].GetString());
+			string cmd = stLoadConfigError.Encode();
 
+			uint8_t arrBuf[2048];
+			uint32_t nOffset = 0;
+			CCodeEngine::Encode(arrBuf, sizeof(arrBuf), nOffset, cmd.size());
+			strncpy((char *)arrBuf + nOffset, cmd.c_str(), cmd.size());
+
+			pIoSession->Write(arrBuf, cmd.size() + nOffset);
 		}
 	}
 	else if(strcmp(stCmd.GetString(), "load finish") == 0)
@@ -126,11 +134,16 @@ void CCmdHandler::SetConnector(CConnector *pConnector)
 
 int32_t CCmdHandler::LoadConfig(const char *pConfigName, const char *pFileContent)
 {
+	int32_t nResult = 0;
 	IConfig *pConfig = g_Frame.GetSafeConfig(pConfigName);
 	if(pConfig != NULL)
 	{
-		pConfig->Parser((char *)pFileContent);
+		nResult = pConfig->Parser((char *)pFileContent);
 	}
-	return 0;
+	else
+	{
+		nResult = -1;
+	}
+	return nResult;
 }
 
