@@ -11,9 +11,21 @@
 #include "../common/common_object.h"
 #include "../common/common_typedef.h"
 #include "../common/common_export.h"
+#include "../netevent/net_handler.h"
 #include "frame_namespace.h"
 
+using namespace NETEVENT;
+
 FRAME_NAMESPACE_BEGIN
+
+class EXPORT IInitFrame
+{
+public:
+	IInitFrame(){};
+	virtual ~IInitFrame(){};
+
+	virtual int32_t InitFrame(CNetHandler *pNetHandler) = 0;
+};
 
 class EXPORT IConfig : public CBaseObject
 {
