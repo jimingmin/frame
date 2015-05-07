@@ -13,9 +13,15 @@
 #include "../include/msg_head.h"
 #include "../netevent/net_impl.h"
 #include "../rapidjson/document.h"
+#include "redis_channel.h"
 using namespace rapidjson;
 
 using namespace NETEVENT;
+
+#define	KickReason_AnotherLogin		"帐号在另一个设备登录"
+#define KickReason_AccountLocked	"帐号被锁定"
+#define	KickReason_NotLogined		"帐号未登录"
+#define	KickReason_Unknown			"服务器未知错误"
 
 class CServerHelper
 {
@@ -44,6 +50,8 @@ public:
 	static int32_t MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, uint8_t *pOutBuf, int32_t nOutBufSize);
 
 	static int32_t SendMsgToClient(IIOSession *pIoSession, MsgHeadCS *pMsgHeadCS, uint8_t *pBuf, int32_t nBufSize);
+
+	static int32_t KickUser(ControlHead *pControlHead, MsgHeadCS *pMsgHeadCS, CRedisChannel *pRedisChannel, const char *szReason);
 };
 
 #endif /* SERVER_HELPER_H_ */

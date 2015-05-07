@@ -9,6 +9,7 @@
 #include "../common/common_crypt.h"
 #include "../common/common_datetime.h"
 #include "../include/typedef.h"
+#include "../include/account_msg.h"
 #include "frame.h"
 
 using namespace FRAME;
@@ -244,3 +245,25 @@ int32_t CServerHelper::SendMsgToClient(IIOSession *pIoSession, MsgHeadCS *pMsgHe
 	g_Frame.Dump(NULL, pMsgHeadCS, NULL, "send ");
 	return pIoSession->Write(arrMsg, nTotalSize);
 }
+
+
+int32_t CServerHelper::KickUser(ControlHead *pControlHead, MsgHeadCS *pMsgHeadCS, CRedisChannel *pRedisChannel, const char *strReason)
+{
+	ControlHead stCtlHead;
+	stCtlHead = *pControlHead;
+	stCtlHead.m_nControlCode = enmControlCode_Close;
+
+	MsgHeadCS stMsgHeadCS;
+	stMsgHeadCS.m_nMsgID = MSGID_KICKUSER_NOTI;
+	stMsgHeadCS.m_nSrcUin = pMsgHeadCS->m_nSrcUin;
+	stMsgHeadCS.m_nDstUin = pMsgHeadCS->m_nDstUin;
+
+	CKickUserNoti stKickUserNoti;
+	stKickUserNoti.m_strReason = strReason;
+
+	uint8_t arrRespBuf[MAX_MSG_SIZE];
+
+	uint16_t nTotalSize = CServerHelper::MakeMsg(&stCtlHead, &stMsgHeadCS, &stKickUserNoti, arrRespBuf, sizeof(arrRespBuf));
+	return pRedisChannel->RPush(NULL, (char *)arrRespBuf, nTotalSize);
+}
+
