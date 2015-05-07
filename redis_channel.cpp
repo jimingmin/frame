@@ -65,6 +65,17 @@ int32_t CRedisChannel::Del(RedisSession *pSession, const char *szFormat, ...)
 	return nStatus;
 }
 
+int32_t CRedisChannel::Expire(RedisSession *pSession, char *szTarget, int32_t nTimeout)
+{
+	string strKey = m_strChannelKey;
+	if(szTarget != NULL)
+	{
+		strKey += szTarget;
+	}
+
+	return SendCommand("EXPIRE", (char *)strKey.c_str(), pSession, "%d", nTimeout);
+}
+
 //---------------------------string--------------------------------------
 int32_t CRedisChannel::Get(RedisSession *pSession, char *szKey)
 {

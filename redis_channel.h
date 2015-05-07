@@ -45,6 +45,8 @@ public:
 
 	int32_t Del(RedisSession *pSession, const char *szFormat, ...);
 
+	int32_t Expire(RedisSession *pSession, char *szTarget, int32_t nTimeout);
+
 	//---------------------------string--------------------------------------
 
 	int32_t Get(RedisSession *pSession, char *szKey);
