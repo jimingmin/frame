@@ -65,9 +65,7 @@ public:
 
 	EXPORT IBank *GetBank(const char *szBankName);
 
-	EXPORT int32_t StartCmdThread(const char *szServerName, int32_t nServiceType, uint16_t nServiceID, char *szHost, uint16_t nPort);
-
-	EXPORT int32_t StartLogicThread(const char *szServerName);
+	EXPORT int32_t Start(const char *szServerName, int32_t nServiceType, uint16_t nServiceID, char *szHost, uint16_t nPort, IInitFrame *pIniter);
 	/*
 	 * 返回值:	1:not found msg handler
 	 * 			2:decode msg failed

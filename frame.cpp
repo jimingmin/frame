@@ -122,7 +122,7 @@ void CFrame::ClearRunner()
 
 int32_t CFrame::Run(bool bStop/* = false*/)
 {
-	while(bStop)
+	while(!bStop)
 	{
 		list<IRunnable *>::iterator it = m_stRunnerList.begin();
 		for(; it != m_stRunnerList.end(); ++it)
@@ -176,18 +176,15 @@ IBank *CFrame::GetBank(const char *szBankName)
 	return m_pBankMgt->GetBank(szBankName);
 }
 
-int32_t CFrame::StartCmdThread(const char *szServerName, int32_t nServiceType, uint16_t nServiceID, char *szHost, uint16_t nPort)
+int32_t CFrame::Start(const char *szServerName, int32_t nServiceType, uint16_t nServiceID, char *szHost, uint16_t nPort, IInitFrame *pIniter)
 {
 	CCmdThread *pCmdThread = new CCmdThread(&m_stLoadConfigLock, szServerName, nServiceType, nServiceID, szHost, nPort);
-	return pCmdThread->Start();
-}
+	pCmdThread->Start();
 
-int32_t CFrame::StartLogicThread(const char *szServerName)
-{
-	CLogicThread *pLogicThread = new CLogicThread(&m_stLoadConfigLock, szServerName, NULL);
-	pLogicThread->Start();
+	Delay(3 * US_PER_SECOND);
 
-	return 0;
+	CLogicThread *pLogicThread = new CLogicThread(&m_stLoadConfigLock, szServerName, pIniter);
+	return pLogicThread->Start();
 }
 
 int32_t CFrame::FrameCallBack(int32_t nMsgID, ...)
