@@ -8,7 +8,7 @@
 #ifndef FRAME_BANKMGT_H_
 #define FRAME_BANKMGT_H_
 
-#include "../common/common_object.h"
+#include "common/common_object.h"
 #include "frame_impl.h"
 #include "frame_namespace.h"
 #include <map>

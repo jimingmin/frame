@@ -6,8 +6,8 @@
  */
 
 #include "cmd_parser.h"
-#include "../common/common_codeengine.h"
-#include "../common/common_crypt.h"
+#include "common/common_codeengine.h"
+#include "common/common_crypt.h"
 #include <string.h>
 
 int32_t CCmdParser::Init()

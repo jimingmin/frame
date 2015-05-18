@@ -8,11 +8,11 @@
 #ifndef FRAME_TIMERMGT_H_
 #define FRAME_TIMERMGT_H_
 
-#include "../common/common_object.h"
-#include "../common/common_pool.h"
-#include "../common/common_rbtree.h"
-#include "../common/common_mutex.h"
-#include "../common/common_runnable.h"
+#include "common/common_object.h"
+#include "common/common_pool.h"
+#include "common/common_rbtree.h"
+#include "common/common_mutex.h"
+#include "common/common_runnable.h"
 #include "frame_impl.h"
 #include "frame_timer.h"
 #include "frame_namespace.h"
@@ -38,7 +38,7 @@ public:
 	virtual int32_t Uninit();
 	virtual int32_t GetSize();
 
-	int32_t Run();
+	virtual int32_t Run();
 
 	int32_t CreateTimer(TimerProc Proc, CBaseObject *pTimer, CBaseObject *pTimerData, int64_t nCycleTime, bool bLoop, TimerIndex& timerIndex);
 

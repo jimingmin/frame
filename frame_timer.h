@@ -8,11 +8,11 @@
 #ifndef FRAME_TIMER_H_
 #define FRAME_TIMER_H_
 
-#include "../common/common_typedef.h"
-#include "../common/common_errordef.h"
-#include "../common/common_object.h"
-#include "../common/common_complextype.h"
-#include "../common/common_export.h"
+#include "common/common_typedef.h"
+#include "common/common_errordef.h"
+#include "common/common_object.h"
+#include "common/common_complextype.h"
+#include "common/common_export.h"
 
 #include "frame_namespace.h"
 

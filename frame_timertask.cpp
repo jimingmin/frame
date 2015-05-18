@@ -6,8 +6,8 @@
  */
 
 #include "frame_timertask.h"
-#include "../logger/logger.h"
-#include "../common/common_memmgt.h"
+#include "logger/logger.h"
+#include "common/common_memmgt.h"
 
 //extern char *GetMemInfo();
 

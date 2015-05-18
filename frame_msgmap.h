@@ -8,8 +8,8 @@
 #ifndef FRAME_MSGMAP_H_
 #define FRAME_MSGMAP_H_
 
-#include "../common/common_object.h"
-#include "../common/common_typedef.h"
+#include "common/common_object.h"
+#include "common/common_typedef.h"
 #include "frame_msgentry.h"
 #include "frame_msghandle.h"
 #include "frame_namespace.h"

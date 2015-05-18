@@ -8,8 +8,8 @@
 #ifndef CMDPARSER_FACTORY_H_
 #define CMDPARSER_FACTORY_H_
 
-#include "../netevent/net_namespace.h"
-#include "../netevent/net_impl.h"
+#include "netevent/net_namespace.h"
+#include "netevent/net_impl.h"
 
 using namespace NETEVENT;
 

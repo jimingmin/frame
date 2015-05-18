@@ -8,7 +8,7 @@
 #ifndef FRAME_TIMERTASK_H_
 #define FRAME_TIMERTASK_H_
 
-#include "../common/common_object.h"
+#include "common/common_object.h"
 #include "frame_namespace.h"
 #include <string>
 using namespace std;

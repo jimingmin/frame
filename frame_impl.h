@@ -8,10 +8,10 @@
 #ifndef FRAME_IMPL_H_
 #define FRAME_IMPL_H_
 
-#include "../common/common_object.h"
-#include "../common/common_typedef.h"
-#include "../common/common_export.h"
-#include "../netevent/net_handler.h"
+#include "common/common_object.h"
+#include "common/common_typedef.h"
+#include "common/common_export.h"
+#include "netevent/net_handler.h"
 #include "frame_namespace.h"
 
 using namespace NETEVENT;

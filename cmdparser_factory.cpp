@@ -7,7 +7,7 @@
 
 #include "cmdparser_factory.h"
 #include "cmd_parser.h"
-#include "../common/common_memmgt.h"
+#include "common/common_memmgt.h"
 
 CCmdParserFactory::CCmdParserFactory()
 {

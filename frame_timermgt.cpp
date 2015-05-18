@@ -5,9 +5,9 @@
  *      Author: jimm
  */
 
-#include "../common/common_datetime.h"
-#include "../common/common_errordef.h"
-//#include "../common/common_memmgt.h"
+#include "common/common_datetime.h"
+#include "common/common_errordef.h"
+//#include "common/common_memmgt.h"
 #include "frame_timermgt.h"
 
 FRAME_NAMESPACE_BEGIN
@@ -287,13 +287,13 @@ int32_t CTimerMgt::Run()
 	int32_t ret = GetFirstTimer(pTimer, timerIndex);
 	if (0 > ret)
 	{
-		return false;
+		return 0;
 	}
 
 	//定时器结束时间小于当前时间
 	if (pTimer->GetEndTime() > CTimeValue::CurrentTime().Milliseconds())
 	{
-		return false;
+		return 0;
 	}
 
 	//保留TimerSeq 用于保护
@@ -313,7 +313,7 @@ int32_t CTimerMgt::Run()
 	//定时器事件已触发
 	TimerFired(timerIndex,nTimerSeq);
 
-	return true;
+	return 1;
 }
 
 FRAME_NAMESPACE_END

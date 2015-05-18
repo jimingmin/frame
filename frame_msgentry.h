@@ -8,8 +8,8 @@
 #ifndef FRAME_MSGENTRY_H_
 #define FRAME_MSGENTRY_H_
 
-#include "../common/common_object.h"
-#include "../common/common_typedef.h"
+#include "common/common_object.h"
+#include "common/common_typedef.h"
 #include "frame_impl.h"
 #include "frame_msghandle.h"
 #include "frame_namespace.h"

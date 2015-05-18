@@ -8,7 +8,7 @@
 #ifndef FRAME_MACRODEFINE_H_
 #define FRAME_MACRODEFINE_H_
 
-#include "../common/common_export.h"
+#include "common/common_export.h"
 #include "frame_namespace.h"
 
 FRAME_NAMESPACE_BEGIN
