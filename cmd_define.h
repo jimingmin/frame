@@ -8,9 +8,9 @@
 #ifndef CMD_DEFINE_H_
 #define CMD_DEFINE_H_
 
-#include "../rapidjson/document.h"
-#include "../rapidjson/stringbuffer.h"
-#include "../rapidjson/writer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 #include <string>
 using namespace std;
 using namespace rapidjson;
@@ -41,12 +41,13 @@ class CmdRegistReq : public ICmdReq
 #define CMD			"regist"
 public:
 
-	CmdRegistReq(char *szServerName, int32_t nServerType, int32_t nServerID)
+	CmdRegistReq(char *szServerName, int32_t nServerType, int32_t nServerID, bool bLoadConfigFinish)
 	{
 		memset(m_szServerName, 0, sizeof(m_szServerName));
 		strcpy(m_szServerName, szServerName);
 		m_nServerType = nServerType;
 		m_nServerID = nServerID;
+		m_nLoadConfigFinish = bLoadConfigFinish ? 1 : 0;
 	}
 
 	virtual ~CmdRegistReq(){}
@@ -68,10 +69,14 @@ public:
 		Value stServerID(kNumberType);
 		stServerID.SetInt(m_nServerID);
 
+		Value stLoadConfigStatus(kNumberType);
+		stLoadConfigStatus.SetInt(m_nLoadConfigFinish);
+
 		Value stParams(kObjectType);
 		stParams.AddMember("server_name", stServerName, allocator);
 		stParams.AddMember("server_type", stServerType, allocator);
 		stParams.AddMember("server_id", stServerID, allocator);
+		stParams.AddMember("load_config", stLoadConfigStatus, allocator);
 
 		return CmdWrapper(stCmd, stParams, allocator);
 	}
@@ -80,6 +85,7 @@ private:
 	char		m_szServerName[1024];
 	int32_t		m_nServerType;
 	int32_t		m_nServerID;
+	int32_t		m_nLoadConfigFinish;
 };
 
 class LoadConfigError : public ICmdReq
