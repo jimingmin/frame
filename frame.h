@@ -8,11 +8,12 @@
 #ifndef FRAME_H_
 #define FRAME_H_
 
-#include "../common/common_singleton.h"
-#include "../common/common_typedef.h"
-#include "../common/common_export.h"
-#include "../common/common_mutex.h"
-#include "../netevent/net_impl.h"
+#include "common/common_singleton.h"
+#include "common/common_typedef.h"
+#include "common/common_export.h"
+#include "common/common_mutex.h"
+#include "netevent/net_impl.h"
+#include "netevent/net_acceptor.h"
 #include "frame_impl.h"
 #include "frame_namespace.h"
 #include "frame_timermgt.h"
@@ -23,6 +24,8 @@
 #include "frame_bankmgt.h"
 #include "frame_macrodefine.h"
 #include "frame_safeconfig.h"
+#include "frame_listenentry.h"
+#include "frame_serveridpool.h"
 
 #include <signal.h>
 #include <list>
@@ -65,7 +68,9 @@ public:
 
 	EXPORT IBank *GetBank(const char *szBankName);
 
-	EXPORT int32_t Start(const char *szServerName, int32_t nServiceType, uint16_t nServiceID, char *szHost, uint16_t nPort, IInitFrame *pIniter);
+	EXPORT void SetWorkerCount(int32_t nWorkerCount);
+
+	EXPORT int32_t Start(const char *szServerName, int32_t nServiceType, char *szHost, uint16_t nPort, IInitFrame *pIniter);
 	/*
 	 * 返回值:	1:not found msg handler
 	 * 			2:decode msg failed
@@ -80,11 +85,27 @@ public:
 
 	EXPORT int32_t SendMsg(IIOSession *pIoSession, IMsgHead *pMsgHead, IMsgBody *pMsgBody);
 
+	EXPORT void AddListenHandler(const char *szAddr, uint16_t nPort, IPacketParserFactory *pFactory, IIOHandler *pIOHandler);
+
+	EXPORT int32_t GetServerID();
 protected:
 	EXPORT int32_t SetDaemon();
 
+	EXPORT uint16_t MakeWorker(int32_t nWorkerCount);
+
+	EXPORT int32_t Working(const char *szServerName, IInitFrame *pIniter, CNetHandler *pNetHandler);
+
+	EXPORT list<SocketFD> StartWatcherListening(list<CFrameListenEntry *> stListenEntryList);
+
+	EXPORT void StopWatcherListening(list<SocketFD> stHandleList);
+
+	EXPORT list<CAcceptor *> StartWorkerListening(list<SocketFD> stListenHandle, list<CFrameListenEntry *> stListenEntryList, CNetHandler *pNetHandler);
+
+	EXPORT void StopWorkerListening(list<CAcceptor *> stAcceptorList);
+
 protected:
 	string					m_strServerName;
+	int32_t					m_nServerID;
 	list<IRunnable *>		m_stRunnerList;
 	CMsgMapDecl				m_stMsgMap;
 	CFrameTimerTask			*m_pTimerTask;
@@ -92,6 +113,9 @@ protected:
 	CFrameConfigMgt			*m_pConfigMgt;
 	CTimerMgt				*m_pTimerMgt;
 	CFrameBankMgt			*m_pBankMgt;
+	int32_t					m_nWorkerCount;
+	list<CFrameListenEntry *>	m_stListenEntryList;
+	CFrameServerIDPool		m_stServerIDPool;
 };
 
 #define g_Frame		CSingleton<CFrame>::GetInstance()
