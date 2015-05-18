@@ -8,7 +8,7 @@
 #include "cmd_thread.h"
 #include "cmdparser_factory.h"
 #include "cmd_handler.h"
-#include "../netevent/net_handler.h"
+#include "netevent/net_handler.h"
 using namespace NETEVENT;
 
 CCmdThread::CCmdThread(CriticalSection *pSection, const char *szServiceName, int32_t nServiceType, uint16_t nServiceID, const char *szHost, uint16_t nPort)
@@ -52,7 +52,7 @@ void CCmdThread::Execute()
 		int32_t nHasData = pNetHandler->Run();
 		if(nHasData == 0)
 		{
-			Delay(100);
+			Delay(100 * 1000);
 		}
 	}
 

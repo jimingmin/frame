@@ -8,8 +8,8 @@
 #ifndef CMD_THREAD_H_
 #define CMD_THREAD_H_
 
-#include "../common/common_thread.h"
-#include "../common/common_mutex.h"
+#include "common/common_thread.h"
+#include "common/common_mutex.h"
 
 class CCmdThread : public CThread
 {
