@@ -9,15 +9,14 @@
 #include "frame.h"
 #include "redissession_bank.h"
 #include "sessionindex_bank.h"
-#include "../common/common_memmgt.h"
-#include "../common/common_api.h"
-#include "../common/common_datetime.h"
-#include "../include/cachekey_define.h"
+#include "common/common_memmgt.h"
+#include "common/common_api.h"
+#include "common/common_datetime.h"
+#include "cachekey_define.h"
 
-CRedisChannel::CRedisChannel(int32_t nServerID, char *pAddress, uint16_t nPort, char *pChannelKey)
+CRedisChannel::CRedisChannel(int32_t nServerID, char *pAddress, uint16_t nPort)
 :CRedisRaw(nServerID, pAddress, nPort)
 {
-	m_strChannelKey = string(pChannelKey);
 }
 
 int32_t CRedisChannel::OnConnected()
@@ -27,7 +26,6 @@ int32_t CRedisChannel::OnConnected()
 
 void CRedisChannel::OnClosed()
 {
-
 }
 
 //---------------------------transaction--------------------------------
@@ -44,90 +42,54 @@ void CRedisChannel::Exec(RedisSession *pSession)
 }
 
 //---------------------------key-----------------------------------------
-int32_t CRedisChannel::Del(RedisSession *pSession, char *szTarget)
+int32_t CRedisChannel::Del(RedisSession *pSession, const char *szKey)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("DEL", (char *)strKey.c_str(), NULL);
+	return SendCommand("DEL", szKey, NULL);
 }
 
-int32_t CRedisChannel::Del(RedisSession *pSession, const char *szFormat, ...)
+//int32_t CRedisChannel::Del(RedisSession *pSession, const char *szFormat, ...)
+//{
+//	va_list ap;
+//	va_start(ap, szFormat);
+//	int32_t nStatus = SendCommand("DEL", NULL, pSession, szFormat, ap);
+//	va_end(ap);
+//
+//	return nStatus;
+//}
+
+int32_t CRedisChannel::Expire(RedisSession *pSession, const char *szKey, int32_t nTimeout)
 {
-	va_list ap;
-	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("DEL", (char *)m_strChannelKey.c_str(), pSession, szFormat, ap);
-	va_end(ap);
-
-	return nStatus;
-}
-
-int32_t CRedisChannel::Expire(RedisSession *pSession, char *szTarget, int32_t nTimeout)
-{
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("EXPIRE", (char *)strKey.c_str(), pSession, "%d", nTimeout);
+	return SendCommand("EXPIRE", szKey, pSession, "%d", nTimeout);
 }
 
 //---------------------------string--------------------------------------
-int32_t CRedisChannel::Get(RedisSession *pSession, char *szKey)
+int32_t CRedisChannel::Get(RedisSession *pSession, const char *szKey)
 {
 	return SendCommand("GET", szKey, pSession);
 }
 
-int32_t CRedisChannel::IncrBy(RedisSession *pSession, char *szTarget, int64_t nIncrement)
+int32_t CRedisChannel::IncrBy(RedisSession *pSession, const char *szKey, int64_t nIncrement)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("INCRBY", (char *)strKey.c_str(), pSession, "%ld", nIncrement);
+	return SendCommand("INCRBY", szKey, pSession, "%ld", nIncrement);
 }
 
-int32_t CRedisChannel::Incr(RedisSession *pSession, char *szTarget)
+int32_t CRedisChannel::Incr(RedisSession *pSession, const char *szKey)
 {
-	return IncrBy(pSession, szTarget, 1);
+	return IncrBy(pSession, szKey, 1);
 }
 
-int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue)
+int32_t CRedisChannel::Set(RedisSession *pSession, const char *szKey, const char *szValue)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s", szValue);
+	return SendCommand("SET", szKey, pSession, "%s", szValue);
 }
 
-int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, int64_t nValue)
+int32_t CRedisChannel::Set(RedisSession *pSession, const char *szKey, int64_t nValue)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%ld", nValue);
+	return SendCommand("SET", szKey, pSession, "%ld", nValue);
 }
 
-int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue, enum TimeUnit nUnit, int64_t nTime)
+int32_t CRedisChannel::Set(RedisSession *pSession, const char *szKey, const char *szValue, enum TimeUnit nUnit, int64_t nTime)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	char szTimeUnit[8];
 	if(nUnit == enmTimeUnit_Second)
 	{
@@ -139,17 +101,11 @@ int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue
 		strcpy(szTimeUnit, "PX");
 		szTimeUnit[2] = '\0';
 	}
-	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s %s %ld", szValue, szTimeUnit, nTime);
+	return SendCommand("SET", szKey, pSession, "%s %s %ld", szValue, szTimeUnit, nTime);
 }
 
-int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue, enum TimeUnit nUnit, int64_t nTime, enum SetType nType)
+int32_t CRedisChannel::Set(RedisSession *pSession, const char *szKey, const char *szValue, enum TimeUnit nUnit, int64_t nTime, enum SetType nType)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	char szTimeUnit[4];
 	if(nUnit == enmTimeUnit_Second)
 	{
@@ -173,17 +129,11 @@ int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue
 		strcpy(szSetType, "NX");
 		szSetType[2] = '\0';
 	}
-	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s %s %ld %s", szValue, szTimeUnit, nTime, szSetType);
+	return SendCommand("SET", szKey, pSession, "%s %s %ld %s", szValue, szTimeUnit, nTime, szSetType);
 }
 
-int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue, enum SetType nType)
+int32_t CRedisChannel::Set(RedisSession *pSession, const char *szKey, const char *szValue, enum SetType nType)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	char szSetType[4];
 	if(nType == enmSetType_XX)
 	{
@@ -195,252 +145,158 @@ int32_t CRedisChannel::Set(RedisSession *pSession, char *szTarget, char *szValue
 		strcpy(szSetType, "NX");
 		szSetType[2] = '\0';
 	}
-	return SendCommand("SET", (char *)strKey.c_str(), pSession, "%s %s", szValue, szSetType);
+	return SendCommand("SET", szKey, pSession, "%s %s", szValue, szSetType);
 }
 
-int32_t CRedisChannel::SetNX(RedisSession *pSession, char *szKey, char *szValue)
+int32_t CRedisChannel::SetNX(RedisSession *pSession, const char *szKey, const char *szValue)
 {
 	return SendCommand("SETNX", szKey, pSession, "%s", szValue);
 }
 
-int32_t CRedisChannel::SetNX(RedisSession *pSession, char *szKey, int64_t nValue)
+int32_t CRedisChannel::SetNX(RedisSession *pSession, const char *szKey, int64_t nValue)
 {
 	return SendCommand("SETNX", szKey, pSession, "%ld", nValue);
 }
 
-int32_t CRedisChannel::GetSet(RedisSession *pSession, char *szKey, char *szValue)
+int32_t CRedisChannel::GetSet(RedisSession *pSession, const char *szKey, const char *szValue)
 {
 	return SendCommand("GETSET", szKey, pSession, "%s", szValue);
 }
 
-int32_t CRedisChannel::GetSet(RedisSession *pSession, char *szKey, int64_t nValue)
+int32_t CRedisChannel::GetSet(RedisSession *pSession, const char *szKey, int64_t nValue)
 {
 	return SendCommand("GETSET", szKey, pSession, "%ld", nValue);
 }
 
 //---------------------------hash----------------------------------------
-int32_t CRedisChannel::HDel(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::HDel(RedisSession *pSession, const char *szKey, const char *szFormat, ...)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	va_list ap;
 	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("HDEL", (char *)strKey.c_str(), pSession, szFormat, ap);
+	int32_t nStatus = SendCommand("HDEL", szKey, pSession, szFormat, ap);
 	va_end(ap);
 
 	return nStatus;
 }
 
-int32_t CRedisChannel::HMSet(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::HMSet(RedisSession *pSession, const char *szKey, const char *szFormat, ...)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	va_list ap;
 	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("HMSET", (char *)strKey.c_str(), pSession, szFormat, ap);
+	int32_t nStatus = SendCommand("HMSET", szKey, pSession, szFormat, ap);
 	va_end(ap);
 
 	return nStatus;
 }
 
-int32_t CRedisChannel::HMSet(RedisSession *pSession, char *szTarget, int32_t nArgc, const char **Argv, const size_t *ArgvLen)
+int32_t CRedisChannel::HMSet(RedisSession *pSession, const char *szKey, int32_t nArgc, const char **Argv, const size_t *ArgvLen)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("HMSET", (char *)strKey.c_str(), pSession, nArgc, Argv, ArgvLen);
+	return SendCommand("HMSET", szKey, pSession, nArgc, Argv, ArgvLen);
 }
 
-int32_t CRedisChannel::HMGet(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::HMGet(RedisSession *pSession, const char *szKey, const char *szFormat, ...)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	va_list ap;
 	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("HMGET", (char *)strKey.c_str(), pSession, szFormat, ap);
+	int32_t nStatus = SendCommand("HMGET", szKey, pSession, szFormat, ap);
 	va_end(ap);
 
 	return nStatus;
 }
 
-int32_t CRedisChannel::HIncrBy(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::HIncrBy(RedisSession *pSession, const char *szKey, const char *szField, int64_t nIncr)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	va_list ap;
-	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("HINCRBY", (char *)strKey.c_str(), pSession, szFormat, ap);
-	va_end(ap);
-
-	return nStatus;
+	return SendCommand("HINCRBY", szKey, pSession, "%s %ld", szField, nIncr);
 }
 
-int32_t CRedisChannel::HExists(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::HExists(RedisSession *pSession, const char *szKey, const char *szField)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	va_list ap;
-	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("HEXISTS", (char *)strKey.c_str(), pSession, szFormat, ap);
-	va_end(ap);
-
-	return nStatus;
+	return SendCommand("HEXISTS", szKey, pSession, "%s", szField);
 }
 
 //---------------------------list-----------------------------------------
-int32_t CRedisChannel::BLPop(RedisSession *pSession, int32_t nTimeout)
+int32_t CRedisChannel::BLPop(RedisSession *pSession, const char *szKey, int32_t nTimeout)
 {
-	return SendCommand("BLPOP", (char *)m_strChannelKey.c_str(), pSession, "%d", nTimeout);
+	return SendCommand("BLPOP", szKey, pSession, "%d", nTimeout);
 }
 
-int32_t CRedisChannel::RPush(RedisSession *pSession, char *pValue, uint16_t nValueLen)
+int32_t CRedisChannel::RPush(RedisSession *pSession, const char *szKey, const char *pValue, uint16_t nValueLen)
 {
-	return SendCommand("RPUSH", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
+	return SendCommand("RPUSH", szKey, pSession, "%b", pValue, (size_t)nValueLen);
 }
 
-int32_t CRedisChannel::RPush(RedisSession *pSession, char *szTarget, char *pValue, uint16_t nValueLen)
+int32_t CRedisChannel::LPop(RedisSession *pSession, const char *szKey)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("RPUSH", (char *)strKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
+	return SendCommand("LPOP", szKey, pSession);
 }
 
-int32_t CRedisChannel::LPop(RedisSession *pSession)
+int32_t CRedisChannel::LPush(RedisSession *pSession, const char *szKey, const char *pValue, uint16_t nValueLen)
 {
-	return SendCommand("LPOP", (char *)m_strChannelKey.c_str(), pSession);
-}
-
-int32_t CRedisChannel::LPush(RedisSession *pSession, char *pValue, uint16_t nValueLen)
-{
-	return SendCommand("LPUSH", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
-}
-
-int32_t CRedisChannel::LPush(RedisSession *pSession, char *szTarget, char *pValue, uint16_t nValueLen)
-{
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
-	return SendCommand("LPUSH", (char *)strKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
+	return SendCommand("LPUSH", szKey, pSession, "%b", pValue, (size_t)nValueLen);
 }
 
 //---------------------------set-----------------------------------------
-int32_t CRedisChannel::SAdd(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::SAdd(RedisSession *pSession, const char *szKey, const char *szFormat, ...)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	va_list ap;
 	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("SADD", (char *)strKey.c_str(), pSession, szFormat, ap);
+	int32_t nStatus = SendCommand("SADD", szKey, pSession, szFormat, ap);
 	va_end(ap);
 
 	return nStatus;
 }
 
-int32_t CRedisChannel::SRem(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::SIsMember(RedisSession *pSession, const char *szKey, int64_t nField)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
+	return SendCommand("SISMEMBER", szKey, pSession, "%ld", nField);
+}
 
+int32_t CRedisChannel::SIsMember(RedisSession *pSession, const char *szKey, const char *szField)
+{
+	return SendCommand("SISMEMBER", szKey, pSession, "%s", szField);
+}
+
+int32_t CRedisChannel::SRem(RedisSession *pSession, const char *szKey, const char *szFormat, ...)
+{
 	va_list ap;
 	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("SREM", (char *)strKey.c_str(), pSession, szFormat, ap);
+	int32_t nStatus = SendCommand("SREM", szKey, pSession, szFormat, ap);
 	va_end(ap);
 
 	return nStatus;
 }
 
 //---------------------------sortedset-------------------------------------
-int32_t CRedisChannel::ZAdd(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::ZAdd(RedisSession *pSession, const char *szKey, const char *szFormat, ...)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	va_list ap;
 	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("ZADD", (char *)strKey.c_str(), pSession, szFormat, ap);
+	int32_t nStatus = SendCommand("ZADD", szKey, pSession, szFormat, ap);
 	va_end(ap);
 
 	return nStatus;
 }
 
-int32_t CRedisChannel::ZCount(RedisSession *pSession, char *szTarget, int32_t nMinIndex, int32_t nMaxIndex)
+int32_t CRedisChannel::ZCount(RedisSession *pSession, const char *szKey, int32_t nMinIndex, int32_t nMaxIndex)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	string strMinIndex = (nMinIndex == -1 ? "-inf" : itoa(nMinIndex));
 	string strMaxIndex = (nMaxIndex == -1 ? "+inf" : itoa(nMaxIndex));
 
-	return SendCommand("ZCOUNT", (char *)strKey.c_str(), pSession, "%s %s", strMinIndex.c_str(), strMaxIndex.c_str());
+	return SendCommand("ZCOUNT", szKey, pSession, "%s %s", strMinIndex.c_str(), strMaxIndex.c_str());
 }
 
-int32_t CRedisChannel::ZRem(RedisSession *pSession, char *szTarget, const char *szFormat, ...)
+int32_t CRedisChannel::ZRem(RedisSession *pSession, const char *szKey, const char *szFormat, ...)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	va_list ap;
 	va_start(ap, szFormat);
-	int32_t nStatus = SendCommand("ZREM", (char *)strKey.c_str(), pSession, szFormat, ap);
+	int32_t nStatus = SendCommand("ZREM", szKey, pSession, szFormat, ap);
 	va_end(ap);
 
 	return nStatus;
 }
 
-int32_t CRedisChannel::ZRangeByScore(RedisSession *pSession, char *szTarget, int32_t nMinIndex, int32_t nMaxIndex, bool bWithScores, int32_t nOffset, int32_t nCount)
+int32_t CRedisChannel::ZRangeByScore(RedisSession *pSession, const char *szKey, int32_t nMinIndex, int32_t nMaxIndex, bool bWithScores, int32_t nOffset, int32_t nCount)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
-
 	string strMinIndex = (nMinIndex == -1 ? "-inf" : itoa(nMinIndex));
 	string strMaxIndex = (nMaxIndex == -1 ? "+inf" : itoa(nMaxIndex));
 
@@ -449,12 +305,12 @@ int32_t CRedisChannel::ZRangeByScore(RedisSession *pSession, char *szTarget, int
 	{
 		if(nCount < 0)
 		{
-			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %s", strMinIndex.c_str(),
+			nStatus = SendCommand("ZRANGEBYSCORE", szKey, pSession, "%s %s %s", strMinIndex.c_str(),
 					strMaxIndex.c_str(), "WITHSCORES");
 		}
 		else
 		{
-			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %s %s %d %d", strMinIndex.c_str(),
+			nStatus = SendCommand("ZRANGEBYSCORE", szKey, pSession, "%s %s %s %s %d %d", strMinIndex.c_str(),
 					strMaxIndex.c_str(), "WITHSCORES", "LIMIT", (size_t)nOffset, (size_t)nCount);
 		}
 	}
@@ -462,12 +318,12 @@ int32_t CRedisChannel::ZRangeByScore(RedisSession *pSession, char *szTarget, int
 	{
 		if(nCount < 0)
 		{
-			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s", strMinIndex.c_str(),
+			nStatus = SendCommand("ZRANGEBYSCORE", szKey, pSession, "%s %s", strMinIndex.c_str(),
 					strMaxIndex.c_str());
 		}
 		else
 		{
-			nStatus = SendCommand("ZRANGEBYSCORE", (char *)strKey.c_str(), pSession, "%s %s %s %d %d", strMinIndex.c_str(),
+			nStatus = SendCommand("ZRANGEBYSCORE", szKey, pSession, "%s %s %s %d %d", strMinIndex.c_str(),
 					strMaxIndex.c_str(), "LIMIT", (size_t)nOffset, (size_t)nCount);
 		}
 	}
@@ -475,27 +331,40 @@ int32_t CRedisChannel::ZRangeByScore(RedisSession *pSession, char *szTarget, int
 	return nStatus;
 }
 
-
-int32_t CRedisChannel::ZRemRangeByRank(RedisSession *pSession, char *szTarget, int32_t nStartIndex, int32_t nStopIndex)
+int32_t CRedisChannel::ZRank(RedisSession *pSession, const char *szKey, int64_t nField)
 {
-	string strKey = m_strChannelKey;
-	if(szTarget != NULL)
-	{
-		strKey += szTarget;
-	}
+	return SendCommand("ZRANK", szKey, pSession, "%ld", nField);
+}
 
-	return SendCommand("ZREMRANGEBYRANK", (char *)strKey.c_str(), pSession, "%d %d", nStartIndex, nStopIndex);
+int32_t CRedisChannel::ZRank(RedisSession *pSession, const char *szKey, const char *szField)
+{
+	return SendCommand("ZRANK", szKey, pSession, "%s", szField);
+}
+
+int32_t CRedisChannel::ZRemRangeByRank(RedisSession *pSession, const char *szKey, int32_t nStartIndex, int32_t nStopIndex)
+{
+	return SendCommand("ZREMRANGEBYRANK", szKey, pSession, "%d %d", nStartIndex, nStopIndex);
+}
+
+int32_t CRedisChannel::ZScore(RedisSession *pSession, const char *szKey, int64_t nField)
+{
+	return SendCommand("ZSCORE", szKey, pSession, "%ld", nField);
+}
+
+int32_t CRedisChannel::ZScore(RedisSession *pSession, const char *szKey, const char *szField)
+{
+	return SendCommand("ZSCORE", szKey, pSession, "%s", szField);
 }
 
 //----------------------------sub/pub--------------------------------------
-int32_t CRedisChannel::Subscribe(RedisSession *pSession)
+int32_t CRedisChannel::Subscribe(RedisSession *pSession, const char *szKey)
 {
-	return SendCommand("SUBSCRIBE", (char *)m_strChannelKey.c_str(), pSession);
+	return SendCommand("SUBSCRIBE", szKey, pSession);
 }
 
-int32_t CRedisChannel::Unsubscribe(RedisSession *pSession)
+int32_t CRedisChannel::Unsubscribe(RedisSession *pSession, const char *szKey)
 {
-	return SendCommand("UNSUBSCRIBE", (char *)m_strChannelKey.c_str(), pSession);
+	return SendCommand("UNSUBSCRIBE", szKey, pSession);
 }
 
 void CRedisChannel::OnUnsubscribeReply(const redisAsyncContext *pContext, void *pReply, void *pSessionIndex)
@@ -517,8 +386,8 @@ void CRedisChannel::OnUnsubscribeReply(const redisAsyncContext *pContext, void *
 	delete pRedisSession;
 }
 
-int32_t CRedisChannel::Publish(RedisSession *pSession, char *pValue, int32_t nValueLen)
+int32_t CRedisChannel::Publish(RedisSession *pSession, const char *szKey, const char *pValue, int32_t nValueLen)
 {
-	return SendCommand("PUBLISH", (char *)m_strChannelKey.c_str(), pSession, "%b", pValue, (size_t)nValueLen);
+	return SendCommand("PUBLISH", szKey, pSession, "%b", pValue, (size_t)nValueLen);
 }
 
