@@ -22,7 +22,9 @@ OBJ_DIR	= ./.objs
 SRC = $(wildcard *.cpp)
 OBJS = $(addprefix $(OBJ_DIR)/,$(subst .cpp,.o,$(SRC)))
 
-INC = -I$(FRAME_INCLUDE_DIR)
+SERVER_INCLUDE_DIR = $(BASE_DIR)
+
+INC = -I$(SERVER_INCLUDE_DIR)
 
 all : $(TARGET)
 
