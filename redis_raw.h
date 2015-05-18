@@ -8,11 +8,10 @@
 #ifndef REDIS_RAW_H_
 #define REDIS_RAW_H_
 
-#include "../common/common_runnable.h"
-#include "../common/common_object.h"
-#include "../hiredis/hiredis.h"
-#include "../hiredis/async.h"
-#include "../include/typedef.h"
+#include "common/common_runnable.h"
+#include "common/common_object.h"
+#include "hiredis/hiredis.h"
+#include "hiredis/async.h"
 #include "redis_agent.h"
 #include "frame_namespace.h"
 #include <list>
@@ -21,6 +20,11 @@ using namespace std;
 FRAME_NAMESPACE_BEGIN
 
 #define MAX_REDIS_CMD_SIZE		4 * 1024
+
+enum
+{
+	enmMaxInternetAddrLen		= 128,
+};
 
 class CRedisRaw : public CBaseObject
 {
@@ -42,6 +46,12 @@ public:
 
 	virtual void OnUnsubscribeReply(const redisAsyncContext *pContext, void *pReply, void *pSessionIndex);
 
+	const char *GetServerAddressPtr();
+
+	uint32_t GetServerAddress();
+
+	uint16_t GetServerPort();
+
 	int32_t Connect();
 
 	void Close();
@@ -58,21 +68,22 @@ protected:
 
 	int32_t FormatCommand(char szCommand[], int32_t &nCmdSize, const char *szFormat, ...);
 
-	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession = NULL);
+	int32_t SendCommand(const char *szCommand, const char *szKey, void *pSession = NULL);
 
-	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, va_list ap);
+	int32_t SendCommand(const char *szCommand, const char *szKey, void *pSession, const char *szFormat, va_list ap);
 
-	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, ...);
+	int32_t SendCommand(const char *szCommand, const char *szKey, void *pSession, const char *szFormat, ...);
 
-	int32_t SendCommand(const char *szCommand, char *szKey, void *pSession, int32_t nArgc, const char **Argv, const size_t *ArgvLen);
+	int32_t SendCommand(const char *szCommand, const char *szKey, void *pSession, int32_t nArgc, const char **Argv, const size_t *ArgvLen);
 
-	int32_t SendFormatedCommand(void *pSession, char *szCommand, int32_t nCmdLen);
+	int32_t SendFormatedCommand(void *pSession, const char *szCommand, int32_t nCmdLen);
 
 private:
-	static CRedisAgent		m_stRedisAgent;
+	static CRedisAgent		*m_pRedisAgent;
 	bool					m_bConnectSuccess;
 	int32_t					m_nServerID;
 	char					m_arrAddress[enmMaxInternetAddrLen];
+	uint32_t				m_nAddress;
 	uint16_t				m_nPort;
 	redisAsyncContext		*m_pRedisContext;
 };

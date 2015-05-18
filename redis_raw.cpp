@@ -13,14 +13,14 @@
 #include "redissession_bank.h"
 #include "sessionindex_bank.h"
 #include "frame.h"
-#include "../logger/logger.h"
-#include "../common/common_memmgt.h"
+#include "logger/logger.h"
+#include "common/common_memmgt.h"
 
 using namespace LOGGER;
 
 FRAME_NAMESPACE_BEGIN
 
-CRedisAgent CRedisRaw::m_stRedisAgent;
+CRedisAgent *CRedisRaw::m_pRedisAgent = NULL;
 
 CRedisRaw::CRedisRaw(int32_t nServerID, char *pAddress, uint16_t nPort)
 {
@@ -28,8 +28,14 @@ CRedisRaw::CRedisRaw(int32_t nServerID, char *pAddress, uint16_t nPort)
 
 	m_nServerID = nServerID;
 	strcpy(m_arrAddress, pAddress);
+	m_nAddress = (uint32_t)inet_addr(pAddress);
 	m_nPort = nPort;
 	m_bConnectSuccess = false;
+
+	if(m_pRedisAgent == NULL)
+	{
+		m_pRedisAgent = new CRedisAgent();
+	}
 }
 
 CRedisRaw::~CRedisRaw()
@@ -73,7 +79,7 @@ int32_t CRedisRaw::Connect()
 		return 1;
 	}
 
-	m_stRedisAgent.AttachAsyncEvent(m_pRedisContext);
+	m_pRedisAgent->AttachAsyncEvent(m_pRedisContext);
 
 	CRedisGlue::RegRedisContext(m_pRedisContext, this);
 
@@ -162,6 +168,21 @@ void CRedisRaw::OnUnsubscribeReply(const redisAsyncContext *pContext, void *pRep
 
 }
 
+const char *CRedisRaw::GetServerAddressPtr()
+{
+	return m_arrAddress;
+}
+
+uint32_t CRedisRaw::GetServerAddress()
+{
+	return m_nAddress;
+}
+
+uint16_t CRedisRaw::GetServerPort()
+{
+	return m_nPort;
+}
+
 int32_t CRedisRaw::FormatCommand(char szCommand[], int32_t &nCmdSize, const char *szFormat, ...)
 {
     char *pCmd;
@@ -190,8 +211,13 @@ int32_t CRedisRaw::FormatCommand(char szCommand[], int32_t &nCmdSize, const char
     return 0;
 }
 
-int32_t CRedisRaw::SendCommand(const char *szCommand, char *pKey, void *pSession/* = NULL*/)
+int32_t CRedisRaw::SendCommand(const char *szCommand, const char *pKey, void *pSession/* = NULL*/)
 {
+	if(!m_bConnectSuccess)
+	{
+		return 0;
+	}
+
 	int32_t nStatus;
 	if(pSession == NULL)
 	{
@@ -207,8 +233,13 @@ int32_t CRedisRaw::SendCommand(const char *szCommand, char *pKey, void *pSession
 	return nStatus;
 }
 
-int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, va_list ap)
+int32_t CRedisRaw::SendCommand(const char *szCommand, const char *szKey, void *pSession, const char *szFormat, va_list ap)
 {
+	if(!m_bConnectSuccess)
+	{
+		return 0;
+	}
+
     char *pCmd;
     int32_t nLen;
 //    int32_t nStatus;
@@ -229,31 +260,34 @@ int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSessio
     int32_t nIndex = pEnd - pCmd;
     pCmd[nIndex] = '\0';
     int32_t nRowCount = atoi(&pCmd[1]);
-    int32_t nCmdLen = sprintf(szCmd, "*%d\r\n$%zd\r\n%s\r\n$%zd\r\n%s", nRowCount + 2, strlen(szCommand), szCommand, strlen(szKey), szKey);
+
+    int32_t nCmdLen = 0;
+    if(szKey == NULL)
+    {
+    	nCmdLen = sprintf(szCmd, "*%d\r\n$%zd\r\n%s", nRowCount + 1, strlen(szCommand), szCommand);
+    }
+    else
+    {
+		nCmdLen = sprintf(szCmd, "*%d\r\n$%zd\r\n%s\r\n$%zd\r\n%s", nRowCount + 2, strlen(szCommand), szCommand, strlen(szKey), szKey);
+    }
     pCmd[nIndex] = '\r';
     memcpy(&szCmd[nCmdLen], &pCmd[nIndex], nLen - nIndex);
 
     size_t nTotalSize = nCmdLen + nLen - nIndex;
     szCmd[nTotalSize] = '\0';
 
-//    if(pSession == NULL)
-//    {
-//    	nStatus = redisAsyncFormattedCommand(m_pRedisContext, NULL, NULL, szCmd, nTotalSize);
-//    }
-//    else
-//    {
-//    	uint32_t *pSessionIndex = ((CSessionIndexBank *)g_Frame.GetBank(BANK_SESSION_INDEX))->CreateSession();
-//    	*pSessionIndex = ((RedisSession *)pSession)->GetSessionIndex();
-//		nStatus = redisAsyncFormattedCommand(m_pRedisContext, &CRedisGlue::CB_RedisReply, pSessionIndex, szCmd, nTotalSize);
-//    }
-
     free(pCmd);
 
     return SendFormatedCommand(pSession, szCmd, nTotalSize);
 }
 
-int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSession, const char *szFormat, ...)
+int32_t CRedisRaw::SendCommand(const char *szCommand, const char *szKey, void *pSession, const char *szFormat, ...)
 {
+	if(!m_bConnectSuccess)
+	{
+		return 0;
+	}
+
     va_list ap;
     va_start(ap, szFormat);
     int32_t nStatus = SendCommand(szCommand, szKey, pSession, szFormat, ap);
@@ -262,8 +296,13 @@ int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSessio
 	return nStatus;
 }
 
-int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSession, int32_t nArgc, const char **Argv, const size_t *ArgvLen)
+int32_t CRedisRaw::SendCommand(const char *szCommand, const char *szKey, void *pSession, int32_t nArgc, const char **Argv, const size_t *ArgvLen)
 {
+	if(!m_bConnectSuccess)
+	{
+		return 0;
+	}
+
 	int32_t nStatus;
 	char *arrArgv[nArgc + 2];
 	size_t arrArgvLen[nArgc + 2];
@@ -293,8 +332,13 @@ int32_t CRedisRaw::SendCommand(const char *szCommand, char *szKey, void *pSessio
 	return nStatus;
 }
 
-int32_t CRedisRaw::SendFormatedCommand(void *pSession, char *szCommand, int32_t nCmdLen)
+int32_t CRedisRaw::SendFormatedCommand(void *pSession, const char *szCommand, int32_t nCmdLen)
 {
+	if(!m_bConnectSuccess)
+	{
+		return 0;
+	}
+
 	int32_t nStatus;
 
     if(pSession == NULL)
