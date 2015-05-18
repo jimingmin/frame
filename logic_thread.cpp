@@ -10,7 +10,8 @@
 
 using namespace FRAME;
 
-CLogicThread::CLogicThread(CriticalSection *pSection, const char *szServerName, IInitFrame *pIniter)
+CLogicThread::CLogicThread(CriticalSection *pSection, const char *szServerName, IInitFrame *pIniter, list<CFrameListenEntry *> &stListenEntryList):
+		m_stListenEntryList(stListenEntryList)
 {
 	m_pSection = pSection;
 	memset(m_szServerName, 0, sizeof(m_szServerName));
@@ -34,19 +35,6 @@ CLogicThread::~CLogicThread()
 //启动线程
 int32_t CLogicThread::Start()
 {
-//	while(true)
-//	{
-//		if(m_pSection->try_enter())
-//		{
-//			m_pSection->enter();
-//			break;
-//		}
-//		else
-//		{
-//			Delay(100);
-//		}
-//	}
-
 	m_pSection->enter();
 
 	m_pNetHandler->CreateReactor();
@@ -65,6 +53,12 @@ int32_t CLogicThread::Start()
 		}
 	}
 
+	for(list<CFrameListenEntry *>::iterator it = m_stListenEntryList.begin(); it != m_stListenEntryList.end(); ++it)
+	{
+		CAcceptor *pAcceptor = new CAcceptor(m_pNetHandler, (*it)->GetPacketParserFactory(), (*it)->GetIOHandler());
+		pAcceptor->Bind((*it)->GetListenAddr(), (*it)->GetListenPort());
+	}
+
 	return CThread::Start();
 }
 
@@ -77,6 +71,12 @@ int32_t	CLogicThread::Terminate()
 	{
 		g_Frame.ClearRunner();
 		m_pNetHandler->DestoryReactor();
+
+		for(list<CAcceptor *>::iterator it = m_stAcceptorList.begin(); it != m_stAcceptorList.end(); ++it)
+		{
+			delete (*it);
+		}
+		m_stAcceptorList.clear();
 	}
 	return 0;
 }
