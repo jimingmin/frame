@@ -8,20 +8,20 @@
 #ifndef SERVER_HELPER_H_
 #define SERVER_HELPER_H_
 
-#include "../common/common_codeengine.h"
+#include "common/common_codeengine.h"
 #include "../include/control_head.h"
 #include "../include/msg_head.h"
-#include "../netevent/net_impl.h"
-#include "../rapidjson/document.h"
+#include "netevent/net_impl.h"
+#include "rapidjson/document.h"
 #include "redis_channel.h"
 using namespace rapidjson;
 
 using namespace NETEVENT;
 
-#define	KickReason_AnotherLogin		"ÕÊºÅÔÚÁíÒ»¸öÉè±¸µÇÂ¼"
-#define KickReason_AccountLocked	"ÕÊºÅ±»Ëø¶¨"
-#define	KickReason_NotLogined		"ÕÊºÅÎ´µÇÂ¼"
-#define	KickReason_Unknown			"·şÎñÆ÷Î´Öª´íÎó"
+#define	KickReason_AnotherLogin		"å¸å·åœ¨å¦ä¸€ä¸ªè®¾å¤‡ç™»å½•"
+#define KickReason_AccountLocked	"å¸å·è¢«é”å®š"
+#define	KickReason_NotLogined		"å¸å·æœªç™»å½•"
+#define	KickReason_Unknown			"æœåŠ¡å™¨æœªçŸ¥é”™è¯¯"
 
 class CServerHelper
 {
@@ -44,14 +44,29 @@ public:
 
 	static bool GetValue(Value &value, const char *szKey, Value &nValue);
 
+	static void Split(uint8_t *szInputBuf, int32_t nInputSize, uint8_t *szOutputBuf, int32_t &nOutputSize, int32_t nSplitSize);
+
 	static void FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize, ControlCode nCtlCode, uint32_t nUin, SessionID nSessionID,
-			uint32_t nClientAddress, uint16_t nClientPort, int32_t nGateID);
+			uint32_t nClientAddress, uint16_t nClientPort, int32_t nGateID, uint8_t nPhoneType, uint32_t nGateRedisAddress,
+			uint16_t nGateRedisPort);
 
 	static int32_t MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, uint8_t *pOutBuf, int32_t nOutBufSize);
+
+	static int32_t SendSyncNoti(CRedisChannel *pPushClientChannel, ControlHead *pControlHead, uint32_t nUin);
+
+	static int32_t PushToAPNS(CRedisChannel *pPushAPNSChannel, uint32_t nSrcUin, uint32_t nDstUin, uint16_t nMsgID, uint8_t *pBuf, int32_t nBufSize);
 
 	static int32_t SendMsgToClient(IIOSession *pIoSession, MsgHeadCS *pMsgHeadCS, uint8_t *pBuf, int32_t nBufSize);
 
 	static int32_t KickUser(ControlHead *pControlHead, MsgHeadCS *pMsgHeadCS, CRedisChannel *pRedisChannel, const char *szReason);
+
+	static const char *MakeRedisKey(const char *szKey);
+
+	static const char *MakeRedisKey(const char *szBaseKey, int32_t nParamKey);
+
+	static const char *MakeRedisKey(const char *szBaseKey, uint32_t nParamKey);
+
+	static const char *MakeRedisKey(const char *szBaseKey, const char *szParamKey);
 };
 
 #endif /* SERVER_HELPER_H_ */

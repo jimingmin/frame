@@ -6,10 +6,12 @@
  */
 
 #include "server_helper.h"
-#include "../common/common_crypt.h"
-#include "../common/common_datetime.h"
+#include "common/common_crypt.h"
+#include "common/common_datetime.h"
 #include "../include/typedef.h"
 #include "../include/account_msg.h"
+#include "../include/sync_msg.h"
+#include "frame/cachekey_define.h"
 #include "frame.h"
 
 using namespace FRAME;
@@ -174,8 +176,46 @@ bool CServerHelper::GetValue(Value &value, const char *szKey, Value &nValue)
 	return true;
 }
 
+void CServerHelper::Split(uint8_t *szInputBuf, int32_t nInputSize, uint8_t *szOutputBuf, int32_t &nOutputSize, int32_t nSplitSize)
+{
+	for (nOutputSize = 0; nOutputSize < nInputSize;)
+	{
+		if((szInputBuf[nOutputSize] & 0xf0) == 0xe0) /**1110xxxx 10xxxxxx 10xxxxxx*/
+		{
+			if(nOutputSize + 3 > nSplitSize)
+			{
+				break;
+			}
+			nOutputSize += 3;
+		}
+		else if((szInputBuf[nOutputSize] & 0xe0) == 0xc0)/**110xxxxx 10xxxxxx*/
+		{
+			if(nOutputSize + 2 > nSplitSize)
+			{
+				break;
+			}
+			nOutputSize += 2;
+		}
+		else if (szInputBuf[nOutputSize] <= 0x7f)
+		{
+			if(nOutputSize + 1 > nSplitSize)
+			{
+				break;
+			}
+			nOutputSize += 1;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	memcpy(szOutputBuf, szInputBuf, nOutputSize);
+}
+
 void CServerHelper::FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize, ControlCode nCtlCode, uint32_t nUin, SessionID nSessionID,
-			uint32_t nClientAddress, uint16_t nClientPort, int32_t nGateID)
+			uint32_t nClientAddress, uint16_t nClientPort, int32_t nGateID, uint8_t nPhoneType, uint32_t nGateRedisAddress,
+			uint16_t nGateRedisPort)
 {
 	stCtlHead.m_nTotalSize = nTotalSize;
 	stCtlHead.m_nControlCode = nCtlCode;
@@ -185,6 +225,9 @@ void CServerHelper::FillControlHead(ControlHead &stCtlHead, uint16_t nTotalSize,
 	stCtlHead.m_nClientPort = nClientPort;
 	stCtlHead.m_nGateID = nGateID;
 	stCtlHead.m_nTimeStamp = CTimeValue::CurrentTime().Milliseconds();
+	stCtlHead.m_nPhoneType = nPhoneType;
+	stCtlHead.m_nGateRedisAddress = nGateRedisAddress;
+	stCtlHead.m_nGateRedisPort = nGateRedisPort;
 }
 
 int32_t CServerHelper::MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody *pMsgBody, uint8_t *pOutBuf, int32_t nOutBufSize)
@@ -227,6 +270,31 @@ int32_t CServerHelper::MakeMsg(ICtlHead *pCtlHead, IMsgHead *pMsgHead, IMsgBody 
 	return nCtlTotalSize;
 }
 
+int32_t CServerHelper::SendSyncNoti(CRedisChannel *pPushClientChannel, ControlHead *pControlHead, uint32_t nUin)
+{
+	MsgHeadCS stMsgHeadCS;
+	stMsgHeadCS.m_nMsgID = MSGID_STATUSSYNC_NOTI;
+	stMsgHeadCS.m_nSrcUin = nUin;
+	stMsgHeadCS.m_nDstUin = nUin;
+
+	CStatusSyncNoti stStatusSyncNoti;
+
+	uint8_t arrRespBuf[MAX_MSG_SIZE];
+
+	uint16_t nTotalSize = CServerHelper::MakeMsg(pControlHead, &stMsgHeadCS, &stStatusSyncNoti, arrRespBuf, sizeof(arrRespBuf));
+	return pPushClientChannel->RPush(NULL, MakeRedisKey(ClientResp::keyname, pControlHead->m_nGateID), (char *)arrRespBuf, nTotalSize);
+}
+
+int32_t CServerHelper::PushToAPNS(CRedisChannel *pPushAPNSChannel, uint32_t nSrcUin, uint32_t nDstUin, uint16_t nMsgID, uint8_t *pBuf, int32_t nBufSize)
+{
+	int32_t nContentLen = (nBufSize >= 50 ? 50 : nBufSize);
+	char szApnsParams[1024];
+	int32_t nParamsLen = sprintf(szApnsParams, "%u:%u:%d:%d:", nSrcUin, nDstUin, nMsgID, nContentLen);
+	memcpy(&szApnsParams[nParamsLen], pBuf, nContentLen);
+
+	return pPushAPNSChannel->RPush(NULL, "client:resp", szApnsParams, nParamsLen + nContentLen);
+}
+
 int32_t CServerHelper::SendMsgToClient(IIOSession *pIoSession, MsgHeadCS *pMsgHeadCS, uint8_t *pBuf, int32_t nBufSize)
 {
 	uint8_t arrMsg[MAX_MSG_SIZE];
@@ -264,6 +332,34 @@ int32_t CServerHelper::KickUser(ControlHead *pControlHead, MsgHeadCS *pMsgHeadCS
 	uint8_t arrRespBuf[MAX_MSG_SIZE];
 
 	uint16_t nTotalSize = CServerHelper::MakeMsg(&stCtlHead, &stMsgHeadCS, &stKickUserNoti, arrRespBuf, sizeof(arrRespBuf));
-	return pRedisChannel->RPush(NULL, (char *)arrRespBuf, nTotalSize);
+	return pRedisChannel->RPush(NULL, MakeRedisKey(ClientResp::keyname, pControlHead->m_nGateID), (char *)arrRespBuf, nTotalSize);
 }
 
+const char *CServerHelper::MakeRedisKey(const char *szKey)
+{
+	return szKey;
+}
+
+const char *CServerHelper::MakeRedisKey(const char *szBaseKey, int32_t nParamKey)
+{
+	static char szRedisKey[1024];
+	int32_t nRedisKeyLen = sprintf(szRedisKey, "%s%d", szBaseKey, nParamKey);
+	szRedisKey[nRedisKeyLen] = '\0';
+	return szRedisKey;
+}
+
+const char *CServerHelper::MakeRedisKey(const char *szBaseKey, uint32_t nParamKey)
+{
+	static char szRedisKey[1024];
+	int32_t nRedisKeyLen = sprintf(szRedisKey, "%s%u", szBaseKey, nParamKey);
+	szRedisKey[nRedisKeyLen] = '\0';
+	return szRedisKey;
+}
+
+const char *CServerHelper::MakeRedisKey(const char *szBaseKey, const char *szParamKey)
+{
+	static char szRedisKey[1024];
+	int32_t nRedisKeyLen = sprintf(szRedisKey, "%s%s", szBaseKey, szParamKey);
+	szRedisKey[nRedisKeyLen] = '\0';
+	return szRedisKey;
+}
