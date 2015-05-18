@@ -8,9 +8,9 @@
 #ifndef CMD_HANDLER_H_
 #define CMD_HANDLER_H_
 
-#include "../netevent/net_impl.h"
-#include "../netevent/net_ioadapter.h"
-#include "../netevent/net_connector.h"
+#include "netevent/net_impl.h"
+#include "netevent/net_ioadapter.h"
+#include "netevent/net_connector.h"
 
 using namespace NETEVENT;
 
@@ -41,6 +41,7 @@ protected:
 	int32_t				m_nServiceType;
 	uint16_t			m_nServiceID;
 	CConnector			*m_pConnector;
+	bool				m_bLoadConfigFinish;
 };
 
 

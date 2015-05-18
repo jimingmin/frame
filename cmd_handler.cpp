@@ -6,9 +6,9 @@
  */
 
 #include "cmd_handler.h"
-#include "../common/common_codeengine.h"
-#include "../common/common_api.h"
-#include "../logger/logger.h"
+#include "common/common_codeengine.h"
+#include "common/common_api.h"
+#include "logger/logger.h"
 #include "frame_msghandle.h"
 #include "frame_define.h"
 #include "frame.h"
@@ -27,6 +27,7 @@ CCmdHandler::CCmdHandler(CriticalSection *pSection, const char *szServiceName, i
 	m_nServiceType = nServiceType;
 	m_nServiceID = nServiceID;
 	m_pConnector = NULL;
+	m_bLoadConfigFinish = false;
 }
 
 int32_t CCmdHandler::OnOpened(IIOSession *pIoSession)
@@ -34,7 +35,7 @@ int32_t CCmdHandler::OnOpened(IIOSession *pIoSession)
 	WRITE_DEBUG_LOG(MODULE_NAME, "new session!{peeraddress=%s, peerport=%d}\n",
 			pIoSession->GetPeerAddressStr(), pIoSession->GetPeerPort());
 
-	CmdRegistReq stCmdRegist(m_szServiceName, m_nServiceType, m_nServiceID);
+	CmdRegistReq stCmdRegist(m_szServiceName, m_nServiceType, m_nServiceID, m_bLoadConfigFinish);
 	string cmd = stCmdRegist.Encode();
 
 	uint8_t arrBuf[1024];
@@ -65,8 +66,6 @@ int32_t CCmdHandler::OnRecved(IIOSession *pIoSession, uint8_t *pBuf, uint32_t nB
 	Value &stCmd = document["cmd"];
 	Value &stParams = document["params"];
 
-	const char *szCmd = stCmd.GetString();
-
 	if(strcmp(stCmd.GetString(), "load config") == 0)
 	{
 		if(LoadConfig(stParams["config"].GetString(), stParams["content"].GetString()))
@@ -85,6 +84,7 @@ int32_t CCmdHandler::OnRecved(IIOSession *pIoSession, uint8_t *pBuf, uint32_t nB
 	else if(strcmp(stCmd.GetString(), "load finish") == 0)
 	{
 		m_pSection->leave();
+		m_bLoadConfigFinish = true;
 	}
 
 	return 0;
