@@ -6,7 +6,7 @@
  */
 
 #include "redissession_bank.h"
-#include "../common/common_api.h"
+#include "common/common_api.h"
 #include "frame.h"
 
 REGIST_BANK(BANK_REDIS_SESSION, CRedisSessionBank)

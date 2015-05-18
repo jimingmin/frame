@@ -6,7 +6,7 @@
  */
 
 #include "redis_glue.h"
-#include "../logger/logger.h"
+#include "logger/logger.h"
 
 using namespace LOGGER;
 

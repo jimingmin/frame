@@ -8,7 +8,7 @@
 #ifndef REDIS_LOCK_H_
 #define REDIS_LOCK_H_
 
-#include "../common/common_object.h"
+#include "common/common_object.h"
 #include "frame_timer.h"
 #include "frame.h"
 #include "redis_channel.h"

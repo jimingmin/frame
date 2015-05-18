@@ -9,8 +9,8 @@
 #define REDIS_AGENT_H_
 
 #include <stdlib.h>
-#include "../common/common_runnable.h"
-#include "../hiredis/adapters/libevent.h"
+#include "common/common_runnable.h"
+#include "hiredis/adapters/libevent.h"
 #include "frame_namespace.h"
 
 FRAME_NAMESPACE_BEGIN

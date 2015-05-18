@@ -6,7 +6,7 @@
  */
 
 #include "redislock_bank.h"
-#include "../common/common_api.h"
+#include "common/common_api.h"
 #include "frame.h"
 #include "redissession_bank.h"
 

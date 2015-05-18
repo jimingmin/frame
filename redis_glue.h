@@ -9,7 +9,7 @@
 #define REDIS_GLUE_H_
 
 #include "redis_raw.h"
-#include "../hiredis/hiredis.h"
+#include "hiredis/hiredis.h"
 #include "frame_namespace.h"
 #include "frame_impl.h"
 #include <map>

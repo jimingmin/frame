@@ -6,7 +6,7 @@
  */
 
 #include "redis_lock.h"
-#include "../common/common_datetime.h"
+#include "common/common_datetime.h"
 #include "redissession_bank.h"
 
 void RedisLock::SetSessionIndex(uint32_t nSessionIndex)
@@ -75,7 +75,7 @@ int32_t RedisLock::Unlock()
 		return 0;
 	}
 
-	return m_pRedisChannel->Del(NULL, (char *)m_strLockName.c_str());
+	return m_pRedisChannel->Del(NULL, m_strLockName.c_str());
 }
 
 int32_t RedisLock::OnSessionSetNX(int32_t nResult, void *pReply, void *pSession)
@@ -93,7 +93,7 @@ int32_t RedisLock::OnSessionSetNX(int32_t nResult, void *pReply, void *pSession)
 		if(pRedisReply->integer != 0)
 		{
 			pRedisSession->SetHandleRedisReply(static_cast<RedisReply>(&RedisLock::OnSessionGet));
-			return m_pRedisChannel->Get(pRedisSession, (char *)m_strLockName.c_str());
+			return m_pRedisChannel->Get(pRedisSession, m_strLockName.c_str());
 		}
 	}
 	else if(pRedisReply->type == REDIS_REPLY_NIL)
@@ -130,7 +130,7 @@ int32_t RedisLock::OnSessionGet(int32_t nResult, void *pReply, void *pSession)
 			m_nLockExpireTime = nCurMilliTime + (30 * MS_PER_SECOND);
 			pRedisSession->SetHandleRedisReply(static_cast<RedisReply>(&RedisLock::OnSessionGetSet));
 
-			return m_pRedisChannel->GetSet(pRedisSession, (char *)m_strLockName.c_str(), m_nLockExpireTime);
+			return m_pRedisChannel->GetSet(pRedisSession, m_strLockName.c_str(), m_nLockExpireTime);
 		}
 	}
 	else

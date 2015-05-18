@@ -8,8 +8,8 @@
 #ifndef REDIS_SESSION_H_
 #define REDIS_SESSION_H_
 
-#include "../common/common_object.h"
-#include "../common/common_datetime.h"
+#include "common/common_object.h"
+#include "common/common_datetime.h"
 #include "frame_timer.h"
 #include "frame.h"
 #include <stddef.h>

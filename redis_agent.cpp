@@ -23,7 +23,8 @@ CRedisAgent::~CRedisAgent()
 
 int32_t CRedisAgent::Run()
 {
-	return event_base_loop(m_pRedisEvtBase, EVLOOP_NONBLOCK);
+	event_base_loop(m_pRedisEvtBase, EVLOOP_NONBLOCK);
+	return 0;
 }
 
 void CRedisAgent::AttachAsyncEvent(redisAsyncContext *pContext)
