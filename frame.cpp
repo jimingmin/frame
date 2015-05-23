@@ -192,7 +192,7 @@ IBank *CFrame::GetBank(const char *szBankName)
 
 void CFrame::SetWorkerCount(int32_t nWorkerCount)
 {
-	if((nWorkerCount <= (5 * m_nWorkerCount)) && (nWorkerCount >= 1))
+	if((nWorkerCount <= (5 * m_nWorkerCount)) && (nWorkerCount >= 0))
 	{
 		m_nWorkerCount = nWorkerCount;
 	}
@@ -203,7 +203,14 @@ int32_t CFrame::Start(const char *szServerName, int32_t nServiceType, char *szHo
 	list<SocketFD> stListenHandle = StartWatcherListening(m_stListenEntryList);
 
 //	MakeWorker(m_nWorkerCount);
-	m_nServerID = MakeWorker(m_nWorkerCount);
+	if(m_nWorkerCount <= 0)
+	{
+		m_nServerID = m_stServerIDPool.PopServerID();
+	}
+	else
+	{
+		m_nServerID = MakeWorker(m_nWorkerCount);
+	}
 
 	CLogger::Start();
 
