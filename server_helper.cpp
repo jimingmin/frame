@@ -282,7 +282,10 @@ int32_t CServerHelper::SendSyncNoti(CRedisChannel *pPushClientChannel, ControlHe
 	uint8_t arrRespBuf[MAX_MSG_SIZE];
 
 	uint16_t nTotalSize = CServerHelper::MakeMsg(pControlHead, &stMsgHeadCS, &stStatusSyncNoti, arrRespBuf, sizeof(arrRespBuf));
-	return pPushClientChannel->RPush(NULL, MakeRedisKey(ClientResp::keyname, pControlHead->m_nGateID), (char *)arrRespBuf, nTotalSize);
+	pPushClientChannel->RPush(NULL, MakeRedisKey(ClientResp::keyname, pControlHead->m_nGateID), (char *)arrRespBuf, nTotalSize);
+
+	g_Frame.Dump(pControlHead, &stMsgHeadCS, &stStatusSyncNoti, "send");
+	return 0;
 }
 
 int32_t CServerHelper::PushToAPNS(CRedisChannel *pPushAPNSChannel, uint32_t nSrcUin, uint32_t nDstUin, uint16_t nMsgID, uint8_t *pBuf, int32_t nBufSize)
@@ -332,7 +335,10 @@ int32_t CServerHelper::KickUser(ControlHead *pControlHead, MsgHeadCS *pMsgHeadCS
 	uint8_t arrRespBuf[MAX_MSG_SIZE];
 
 	uint16_t nTotalSize = CServerHelper::MakeMsg(&stCtlHead, &stMsgHeadCS, &stKickUserNoti, arrRespBuf, sizeof(arrRespBuf));
-	return pRedisChannel->RPush(NULL, MakeRedisKey(ClientResp::keyname, pControlHead->m_nGateID), (char *)arrRespBuf, nTotalSize);
+	pRedisChannel->RPush(NULL, MakeRedisKey(ClientResp::keyname, pControlHead->m_nGateID), (char *)arrRespBuf, nTotalSize);
+
+	g_Frame.Dump(&stCtlHead, &stMsgHeadCS, &stKickUserNoti, "send ");
+	return 0;
 }
 
 const char *CServerHelper::MakeRedisKey(const char *szKey)
