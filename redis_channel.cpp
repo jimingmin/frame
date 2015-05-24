@@ -277,6 +277,11 @@ int32_t CRedisChannel::ZAdd(RedisSession *pSession, const char *szKey, const cha
 	return nStatus;
 }
 
+int32_t CRedisChannel::ZCard(RedisSession *pSession, const char *szKey)
+{
+	return SendCommand("ZCARD", szKey, pSession);
+}
+
 int32_t CRedisChannel::ZCount(RedisSession *pSession, const char *szKey, int32_t nMinIndex, int32_t nMaxIndex)
 {
 	string strMinIndex = (nMinIndex == -1 ? "-inf" : itoa(nMinIndex));

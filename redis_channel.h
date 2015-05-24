@@ -108,6 +108,8 @@ public:
 	//---------------------------sortedset-------------------------------------
 	int32_t ZAdd(RedisSession *pSession, const char *szKey, const char *szFormat, ...);
 
+	int32_t ZCard(RedisSession *pSession, const char *szKey);
+
 	int32_t ZCount(RedisSession *pSession, const char *szKey, int32_t nMinIndex = -1, int32_t nMaxIndex = -1);
 
 	int32_t ZRem(RedisSession *pSession, const char *szKey, const char *szFormat, ...);
