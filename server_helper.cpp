@@ -295,7 +295,7 @@ int32_t CServerHelper::PushToAPNS(CRedisChannel *pPushAPNSChannel, uint32_t nSrc
 	int32_t nParamsLen = sprintf(szApnsParams, "%u:%u:%d:%d:", nSrcUin, nDstUin, nMsgID, nContentLen);
 	memcpy(&szApnsParams[nParamsLen], pBuf, nContentLen);
 
-	return pPushAPNSChannel->RPush(NULL, "client:resp", szApnsParams, nParamsLen + nContentLen);
+	return pPushAPNSChannel->RPush(NULL, MakeRedisKey(PushApns::keyname), szApnsParams, nParamsLen + nContentLen);
 }
 
 int32_t CServerHelper::SendMsgToClient(IIOSession *pIoSession, MsgHeadCS *pMsgHeadCS, uint8_t *pBuf, int32_t nBufSize)
