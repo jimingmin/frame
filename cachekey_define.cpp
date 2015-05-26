@@ -131,7 +131,7 @@ const char *UserFollowers::uin = "uin";
 const char *UserFollowers::addtime = "addtime";
 
 //
-const char *UserFriends::servername = "user:socal";
+const char *UserFriends::servername = "user:social";
 const char *UserFriends::keyname = "user:friends:";
 const char *UserFriends::uin = "uin";
 const char *UserFriends::addtime = "addtime";
