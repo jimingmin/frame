@@ -86,6 +86,7 @@ const char *UserBaseInfo::osversion = "osversion";
 const char *UserBaseInfo::phonestyle = "phonestyle";
 const char *UserBaseInfo::lastlogintime = "lastlogintime";
 const char *UserBaseInfo::devicetoken = "devicetoken";
+const char *UserBaseInfo::followbusline_count = "followbusline_count";
 
 //
 const char *AccountInfo::servername = "user:info";
@@ -111,6 +112,8 @@ const char *UserSessionInfo::gateid = "gateid";
 const char *UserSessionInfo::phonetype = "phonetype";
 const char *UserSessionInfo::gateredisaddress = "gateredisaddress";
 const char *UserSessionInfo::gateredisport = "gateredisport";
+const char *UserSessionInfo::tokenkey = "tokenkey";
+const char *UserSessionInfo::datakey = "datakey";
 
 //
 const char *UserUnreadMsgList::servername = "user:unreadmsg";

@@ -175,6 +175,7 @@ public:
 	static const char *phonestyle;
 	static const char *lastlogintime;
 	static const char *devicetoken;
+	static const char *followbusline_count;
 };
 
 //hash
@@ -212,6 +213,8 @@ public:
 	static const char *phonetype;
 	static const char *gateredisaddress;
 	static const char *gateredisport;
+	static const char *tokenkey;
+	static const char *datakey;
 };
 
 //list
