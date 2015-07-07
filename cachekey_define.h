@@ -145,6 +145,7 @@ public:
 		m_stFieldPer[phonestyle] = 1;
 		m_stFieldPer[lastlogintime] = 1;
 		m_stFieldPer[devicetoken] = 1;
+		m_stFieldPer[radar] = 0;
 	}
 
 	static const char *servername;
@@ -176,6 +177,7 @@ public:
 	static const char *lastlogintime;
 	static const char *devicetoken;
 	static const char *followbusline_count;
+	static const char *radar;
 };
 
 //hash
@@ -213,6 +215,14 @@ public:
 	static const char *phonetype;
 	static const char *gateredisaddress;
 	static const char *gateredisport;
+};
+
+//hash
+class UserSessionKey
+{
+public:
+	static const char *servername;
+	static const char *keyname;
 	static const char *tokenkey;
 	static const char *datakey;
 };
