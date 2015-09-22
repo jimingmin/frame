@@ -56,6 +56,14 @@ public:
 	static const char *keyname;
 };
 
+//list
+class PushNoti
+{
+public:
+	static const char *servername;
+	static const char *keyname;
+};
+
 //sortedset
 class UserLookMe
 {
@@ -146,6 +154,8 @@ public:
 		m_stFieldPer[lastlogintime] = 1;
 		m_stFieldPer[devicetoken] = 1;
 		m_stFieldPer[radar] = 0;
+		m_stFieldPer[status] = 0;
+		m_stFieldPer[accounttype] = 0;
 	}
 
 	static const char *servername;
@@ -178,6 +188,8 @@ public:
 	static const char *devicetoken;
 	static const char *followbusline_count;
 	static const char *radar;
+	static const char *status;
+	static const char *accounttype;
 };
 
 //hash
@@ -190,7 +202,6 @@ public:
 	static const char *uin;
 	static const char *accountid;
 	static const char *password;
-	static const char *status;
 };
 
 //sortedset
@@ -225,6 +236,7 @@ public:
 	static const char *keyname;
 	static const char *tokenkey;
 	static const char *datakey;
+	static const char *rc4key;
 };
 
 //list

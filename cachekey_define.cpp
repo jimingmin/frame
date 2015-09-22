@@ -31,6 +31,10 @@ const char *PushSms::servername = "queue";
 const char *PushSms::keyname = "push:sms";
 
 //
+const char *PushNoti::servername = "queue";
+const char *PushNoti::keyname = "push:noti";
+
+//
 const char *UserLookMe::servername = "user:info";
 const char *UserLookMe::keyname = "user:lookme:";
 
@@ -88,6 +92,8 @@ const char *UserBaseInfo::lastlogintime = "lastlogintime";
 const char *UserBaseInfo::devicetoken = "devicetoken";
 const char *UserBaseInfo::followbusline_count = "followbusline_count";
 const char *UserBaseInfo::radar = "radar";
+const char *UserBaseInfo::status = "status";
+const char *UserBaseInfo::accounttype = "accounttype";
 
 //
 const char *AccountInfo::servername = "user:info";
@@ -96,7 +102,6 @@ const char *AccountInfo::accountname = "accountname";
 const char *AccountInfo::uin = "uin";
 const char *AccountInfo::accountid = "accountid";
 const char *AccountInfo::password = "password";
-const char *AccountInfo::status = "status";
 
 //
 const char *UserBlackList::servername = "user:social";
@@ -119,6 +124,7 @@ const char *UserSessionKey::servername = "user:session";
 const char *UserSessionKey::keyname = "user:sessionkey:";
 const char *UserSessionKey::tokenkey = "tokenkey";
 const char *UserSessionKey::datakey = "datakey";
+const char *UserSessionKey::rc4key = "rc4key";
 
 //
 const char *UserUnreadMsgList::servername = "user:unreadmsg";
